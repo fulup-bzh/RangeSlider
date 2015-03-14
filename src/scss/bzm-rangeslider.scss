@@ -1,0 +1,32 @@
+/*
+ * BZM-Datepicker for Foundation
+ *
+ * Author: Fulup Ar Foll
+ * Date  : March-2015
+ * Object: SASS stylesheet, customized to Foundation
+ * References: https://css-tricks.com/stripes-css/
+ *
+ */
+
+.bzm-handle-display .range-slider-handle {
+  background-color: rgba(82, 168, 200, 0.6) !important;
+  width : 50px !important;
+  padding: .25rem .3rem;
+}
+
+.bzm-range-slider {
+
+   &-start,&-stop {
+   display: inline-block;
+   position: absolute;
+   padding-top: 2px;
+   height: 95%;
+   background: repeating-linear-gradient(
+    45deg,
+    #606dbc,
+    #606dbc 10px,
+    #465298 10px,
+    #465298 20px
+  );}
+
+}

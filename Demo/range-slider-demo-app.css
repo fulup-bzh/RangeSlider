@@ -1,0 +1,61 @@
+
+.ui-notification {
+    width: 600px;
+}
+
+
+h3 {
+    color: darkblue;
+}
+
+h4 {
+    color: darkblue;
+    font-size: 1rem;
+}
+
+.zone-1 {
+    margin: 2rem;
+    height: 100%;
+}
+
+.no-extra-margin {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.demo-range-slider  {
+    padding-right: 5rem;
+    width: 95%;
+    background-color: rgba(154, 205, 50, 0.6) !important;
+}
+.demo-range-slider .range-slider-active-segment {
+    background-color: rgba(82, 168, 200, 0.6);
+}
+
+
+#demo-slider-3a {
+   margin-bottom: 0;
+   background-color: rgba(154, 205, 50, 0.6) !important;
+    width: 97%;
+}
+#demo-slider-3b {
+   margin-top: 0;
+    width: 97%;
+}
+
+
+.sample-box {
+  padding: .5rem;
+  margin: .5rem;
+  border-color: rgba(200, 200, 200, 0.6);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(200, 200, 200, 0.6) !important;
+
+}
+
+.display-time {
+    border-color: rgba(82,168,236,0.8) ;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) inset, 0 0 8px rgba(82,168,236,1);
+    color: darkslateblue;
+    margin-top: 1rem;
+    line-height: 1.2rem;
+}

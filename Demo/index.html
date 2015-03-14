@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="Author" content="Fulup Ar Foll">
+	<meta name="Object" content="Angular BZM-RangeSlider For Angular Demo">
+
+	<!-- Load Foundation CSS -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+	<link href="http://cdnjs.cloudflare.com/ajax/libs/foundation/5.2.0/css/foundation.min.css" rel="stylesheet"/>
+
+	<!-- Load Awesome Fonts CSS -->
+	<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"/>
+
+	<!-- Load Angular JS -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.js"></script>
+	<script src="externals/mm-foundation-tpls.min.js"></script>
+	<script src="externals/angular-ui-notification.min.js"></script>
+	<link  href="externals/angular-ui-notification.min.css" rel="stylesheet"/>
+
+    <!-- Load BZM-RangeSlider JS & CSS -->
+	<link href="../dist/bzm-range-slider.css" rel="stylesheet"/>
+	<!--<script src="../dist/bzm-range-slider.min.js"></script>-->
+	<script src="../src/js/BzmRangeSliderMod.js"></script>
+
+    <!-- Load Application Demo -->
+	<script src="range-slider-demo-app.js"></script>
+	<link href="range-slider-demo-app.css" rel="stylesheet"/>
+
+</head>
+
+<body  ng-app="BzmRangeSliderDemo">
+	<div  ng-controller=DemoController>
+
+		<div class="row">
+		<h2>Foundation Angular Range Slider (bzm-range-slider) </h2>
+		</div>
+		<div class="row">
+			<div class="small-2 columns">
+				<div class="row">
+					<range-slider id="vertical-slider-1" vertical="true" class="radius" callback='SliderSelectionCB'
+								  ng-model="sliderVertical1" not-less='10' not-more='80' initial='5' title="Vertical Slider" step=1>
+
+					</range-slider>
+					{{sliderVertical1.getView()}}
+				</div>
+				<div class="row">
+					<range-slider id="vertical-slider-2" vertical="true" class="bzm-handle-display radius" callback='SliderSelectionCB' display-target="handle"
+								  ng-model="sliderVertical2" formatter="SliderFormatCB" not-more='24' initial='5' title="Vertical Slider" step=1>
+					</range-slider>
+				</div>
+
+				<div class="row">
+					<range-slider id="vertical-slider-2" vertical="true" class="bzm-handle-display radius" display-target="handle"
+								  initial="6,20" dual-handles="true"  callback='SliderSelectionCB'
+								  ng-model="sliderVertical2" formatter="SliderFormatCB" not-more='24' initial='5' title="Vertical Slider" step=-2>
+					</range-slider>
+				</div>
+			</div>
+
+			<div class="small-10 columns">
+
+			<div class="row">
+				<h3>Simple Range Sliders</h3>
+
+				<!-- ************* Sample 1 ***************** -->
+				<div class="small-6 columns">
+					<div class="sample-box">
+					<div class="row collapse">
+						<h4>Basic Slider 0-100</h4>
+						<div class="small-10 columns">
+						   <range-slider id="demo-slider-1" class="demo-range-slider radius" ng-model="rangeSliderVal1" initial='50' callback="SliderSelectionCB"></range-slider>
+						</div>
+						<div class="display-time small-2 columns">
+							{{rangeSliderVal1.getValue()}}%
+						</div>
+					</div>
+					<div class="row collapse">
+					<ul>
+						<li>Internal-Value : {{rangeSliderVal1.getValue()}}</li>
+						<li>Relative-Value : {{rangeSliderVal1.getRelative()}}</li>
+					</ul>
+					</div>
+				</div>
+				</div>
+
+				<!-- ************* Sample 2 ***************** -->
+				<div class="small-6 columns">
+				<div class="sample-box">
+						<div class="row collapse">
+						<h4>Slider Start=7 Stop=22 Step=-2</h4>
+						<div class="small-10 columns">
+							<range-slider id="demo-slider-2" class="demo-range-slider radius"
+									placeholder="Basic Reduced Selection" initial="12" not-less="7" not-more="22" by-step="-2"
+									ng-model="rangeSliderVal2" callback="SliderSelectionCB" formatter="SliderFormatCB"
+							></range-slider>
+						</div>
+						<div class="display-time small-2 columns">
+								{{rangeSliderVal2.getView()}}
+						</div>
+					</div>
+					<div class="row collapse">
+						<ul>
+						<li>Internal-Value : {{rangeSliderVal2.getValue()}}</li>
+						<li>Relative-Value : {{rangeSliderVal2.getRelative()}}</li>
+						</ul>
+					</div>
+				</div>
+				</div>
+				</div>
+
+			<!-- ************* Sample 3 ***************** -->
+			<div class="row">
+				<h3>Synchronized Range Slider</h3>
+				<div class="sample-box">
+					<div class="row collapse">
+				<div class="small-10 columns">
+					<range-slider id="demo-slider-3a" class="radius demo-slider-3 bzm-handle-display" ng-model="sliderVal3in" stop-at="sliderVal3out.getValue()" display-target="handle"
+								  callback='SliderSelectionCB' formatter="SliderFormatCB" title="Checkin time" initial='7' by-step=-2 not-more="24">
+					</range-slider>
+					<range-slider id="demo-slider-3b" class="radius demo-slider-3 bzm-handle-display" ng-model="sliderVal3out" start-at="sliderVal3in.getValue()" display-target="handle"
+								  callback='SliderSelectionCB' formatter="SliderFormatCB"  title="Checkout time"  initial='18' by-step=-2 not-more="24">
+					</range-slider>
+				</div>
+				<div class="display-time small-2 columns">
+					<ul class="no-extra-margin">
+					<li>Start = {{sliderVal3in.getView()}}</li>
+					<li>Stop  = {{sliderVal3out.getView()}}</li>
+					<li>Offset= {{FormatTimeDiff(sliderVal3in,sliderVal3out)}}</li>
+					</ul>
+				</div>
+			</div>
+			</div>
+			</div>
+
+			<!-- ************* Sample 4 ***************** -->
+			<div class="row">
+				<h3>Checkin/Checkout Dual Range Slider</h3>
+				<div class="sample-box">
+				<range-slider id="demo-slider-4" class='min-max-sliders demo-range-slider bzm-handle-display radius'  ng-model="rangeSliderVal4" display-target="handle" dual-handles='true' title="Min/Max Slider" step=-2 not-more="24"
+							  formatter="SliderFormatCB" callback='SliderDualSelectionCB' initial="6,20">
+				</range-slider>
+				<i class="display-time">Low:<b>{{rangeSliderVal4.getView(0)}}</b> height:<b>{{rangeSliderVal4.getView(1)}}</b> Lenght:<b>{{FormatTimeDiff(rangeSliderVal4)}}</b></i>
+			</div>
+
+
+			</div>
+		</div>
+  	 </div>
+
+
+	</div>
+</body>
+
+</html>

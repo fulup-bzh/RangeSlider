@@ -7,8 +7,7 @@ Project :
  - demo: http://breizhme.net/rangeslider/demo/
  - home: https://github.com/fulup-bzh/RangeSlider
 
-This RangeSlider is port of: http://foundation.zurb.com/docs/components/range_slider.html
-
+This RangeSlider is Angular ported version for http://foundation.zurb.com/docs/components/range_slider.html
 
 Installation
 -------------
@@ -37,7 +36,7 @@ Usage  <range-slider>
       <!-- Angular Scope Variables -->
       callback="myCallBack"                    // $scope.myCallBack(sliderhandle) is called when ever slider handle blur
       formatter="SliderFormatCB"               // $scope.myFormatter(value, sliderid) when exist is call when ever slider handle moves. Should return external form of slider value.
-      ng-model="xxxxxx"                        // Must exists. It is the angular variable model for a given slider
+      ng-model="xxxxxx"                        // xxx Must be defined, script will store a new RangerObject within provided ng-model variable.
       start-at="ScopeVar"                      // Dynamic limitation when slider is constrains by an external componant [ex: check in/out]
       stop-at="ScopeVar"                       // Idem but for end.
 
@@ -50,5 +49,15 @@ Usage  <range-slider>
       initial='value|[start/stop]'             // slider initial value [dual-handles] may have initial values
 
    /></range-slider>
+
+
+   within JS app ng-model=xxxx is a RangerObject.
+
+    xxxx.getValue(0|1)    return current value of RangeSlider for chosen handle [default is handle:0]
+    xxxx.getView(0|1)     equivalement to getValue but for external representation of handle value after formatter callback
+    xxxx.setValue(0|1)    set the value for a chosen handle
+    xxxx.getRelative(0|1) return relative position of chosen handle
+
+
 
 ```

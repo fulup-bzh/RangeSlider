@@ -1,9 +1,13 @@
 /*
-     Author: Fulup Ar Foll
-     Date: March 2015
-     Object: Port of Foundation-5 sliders to Angular
-     Reference: https://github.com/zurb/foundation
-
+ *    Author: Fulup Ar Foll
+ *    Date: March 2015
+ *    Object: Port of Foundation-5 sliders to Angular
+ *
+ *    Reference: https://github.com/zurb/foundation
+ *
+ *    Dependencies module only depend on Foundation RangeSlider CSS
+ *        https://github.com/zurb/foundation/blob/master/scss/foundation/components/_range-slider.scss
+ *
  */
 
 
@@ -11,6 +15,8 @@
     var RangeSlider = angular.module('bzm-range-slider',[]);
 
     function RangeSliderHandle (scope) {
+        var internals = [];
+        var externals = [];
 
         this.getId = function() {
             return scope.sliderid;
@@ -18,9 +24,16 @@
 
         this.getView= function (handle) {
             if (!handle) handle = 0;
-            if (scope.formatter) {
-                return  scope.formatter(scope.value[handle], scope.sliderid);
-            } else return  scope.value[handle];
+
+            // if value did not change return current external representation
+            if (scope.value[handle] === internals[handle]) return externals[handle];
+
+            // build external representation and save it for further requests
+            internals[handle] = scope.value[handle];
+            if (scope.formatter) externals[handle] = scope.formatter(scope.value[handle], scope.sliderid);
+            else  externals[handle] = scope.value[handle];
+
+            return externals[handle];
         };
 
         this.getValue= function (handle) {
@@ -75,7 +88,6 @@
                 if (scope.bystep <  0) {
                     var power  =  Math.pow (10,(scope.bystep * -1));
                     var result = scope.notLess + parseInt (point * power) / power;
-                    console.log ("point=%d result=%d pow=%d",point, result, power)
                     return (result);
                 }
 
@@ -92,8 +104,6 @@
                     scope.relative[handle] = (offset) /  (scope.bounds.bar.width - scope.bounds.handles[handle].width);
                 }
                 var newvalue = scope.normalize (scope.relative[handle]);
-
-                console.log ("getValue offset=%d newvalue=%d relative=%d", offset, newvalue, scope.relative[handle])
 
                 // if internal value change update or model
                 if (newvalue != scope.value[handle]) {
@@ -114,29 +124,24 @@
                     scope.start.css('height',offset + 'px');
                 } else {
                     var offset = scope.bounds.bar.width * (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    $log.log ('scope.setStart elem=', scope.start, "value=", value,'offset=%d', offset);
                     scope.start.css('width',offset + 'px');
                 }
             };
 
             scope.setStop = function (value) {
 
-                console.log ("setStop value=%d", value)
                 if (scope.vertical) {
                     var offset = scope.bounds.bar.height * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.start.css('height',offset + 'px');
                 } else {
                     var offset = scope.bounds.bar.width * (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    $log.log ('scope.setStart elem=', scope.start, "value=", value,'offset=', offset);
                     scope.stop.css({'right': 0, 'width': (scope.bounds.bar.width  - offset) + 'px'});
                 }
             };
 
             scope.translate = function (offset, handle) {
-                $log.log ("ranslate=", scope.handles[handle], "handle=", handle, "offset=", offset)
                 if (scope.vertical) {
                     var voffset = scope.bounds.bar.height - offset;
-                    console.log ("offset=%d voffset=%d", offset, voffset)
                     scope.handles[handle].css({
                         '-webkit-transform': 'translateY(' + voffset + 'px)',
                         '-moz-transform': 'translateY(' + voffset + 'px)',
@@ -147,7 +152,7 @@
                    if (!scope.dual) scope.slider.css('height',offset + 'px');
                    else if (scope.relative[1] && scope.relative[0]) {
                        var height = parseInt ((scope.relative[1] - scope.relative[0]) *  scope.bounds.bar.height);
-                       var start  = parseInt (scope.relative[0] *  scope.bounds.bar.height);
+                       var start  = parseInt ((scope.relative[0] *  scope.bounds.bar.height));
                        scope.slider.css ({'bottom': start+'px','height': height + 'px'})
                    }
                 } else {
@@ -170,7 +175,6 @@
             // position handle on the bar depending a given value
             scope.setvalue = function (value , handle) {
                 var offset;
-                console.log ("setvalue=%d", value)
 
                 // if value did not change ignore
                 if (value === scope.value[handle]) return;
@@ -181,7 +185,8 @@
 
                 if (scope.vertical) {
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    offset = (scope.relative[handle] * scope.bounds.bar.height) + scope.bounds.handles[handle].height;
+                    if (handle ===0) offset = (scope.relative[handle] * scope.bounds.bar.height) + scope.bounds.handles[handle].height;
+                    if (handle ===1) offset = (scope.relative[handle] * scope.bounds.bar.height);
                 } else {
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
                     offset = scope.relative[handle] *  scope.bounds.bar.width;
@@ -199,7 +204,6 @@
             // Minimal keystroke handling to close picker with ESC [scope.active is current handle index]
             scope.keydown=  function(e){
 
-                console.log ("scope.keydown handle=%d value=%d", scope.active, scope.value[scope.active] )
                 switch(e.keyCode){
                     case 39: // Right
                     case 38: // up
@@ -217,7 +221,6 @@
             };
 
             scope.focusCB = function (inside) {
-                console.log ("focusCB inside=%d", inside)
                 if (inside) {
                     $document.on('keypress',scope.keydown);
                 } else {
@@ -303,10 +306,7 @@
 
             scope.init = function () {
                 console.log ("init range-slider id=%s", attrs.id);
-                $log.log ("scope=", scope);
-
                 // let's use a dedicated object to handle Application/Component liaison
-
                 scope.sliderid = attrs.id || "range-slide-" + parseInt (Math.random() * 1000);
                 scope.bystep   = parseInt(attrs.byStep) || 1;
                 scope.vertical = attrs.vertical   || false;
@@ -344,6 +344,8 @@
                         case 'handle' :
                         case 'handles' :
                             scope.displays = scope.handles;
+                            scope.handles[0].addClass('bzm-range-slider-display');
+                            if (scope.dual) scope.handles[1].addClass('bzm-range-slider-display');
                             break;
                         default:
                             scope.displays =  [$document.getElementById (attrs.displayTarget)];
@@ -355,7 +357,6 @@
 
                 // Monitor any changes on start/stop dates.
                 scope.$watch('startAt', function() {
-                    console.log ('id=%s startAt=%d value=%d', scope.sliderid, scope.startAt, scope.value)
                     if (scope.value < scope.startAt ) {
                         //scope.setvalue (scope.startAt);
                     }
@@ -363,7 +364,6 @@
                 });
 
                 scope.$watch('stopAt' , function() {
-                    console.log ('id=%s stopAt changed %d value=%d', scope.sliderid, scope.stopAt, scope.ngModel)
                     if (scope.value > scope.stopAt) {
                         //scope.setvalue (scope.stopAt);
                     }

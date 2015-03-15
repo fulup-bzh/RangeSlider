@@ -17,11 +17,11 @@ var opa = angular.module('BzmRangeSliderDemo', ['mm.foundation','ui-notification
 
 opa.controller('DemoController', ['$log','$scope', 'Notification', DemoController]);
 function DemoController ($log, scope, Notification) {
-    scope.count=0;
+    scope.count=0;  // development counter to prevent from infinite loop
 
     console.log ("Initialisation of DemoController");
 
-    // small helper to compute time in between two values
+    // demo helper to compute offset time in between two values
     scope.FormatTimeDiff = function (checkin, checkout) {
         var value;
 
@@ -36,7 +36,7 @@ function DemoController ($log, scope, Notification) {
     };
 
 
-    // Call everything slider handle is moved should return the external view of range slider
+    // Call when external representation of a slider needs to be updated
     scope.SliderFormatCB = function (value, id) {
         var hours  = parseInt (value);
         var minutes= parseInt((value%1)*60);
@@ -46,23 +46,17 @@ function DemoController ($log, scope, Notification) {
     };
 
 
-    // Called only when mouse quit the slider
+    // Callback for standard slider call when mouse quit the slider
     scope.SliderSelectionCB = function (slider) {
-
-        if (scope.count++ > 1000) return; // more than 1000 mean we have a bug :)
-
-        $log.log (scope.count, "scope.RangeSliderCB Slider=", slider);
+        if (scope.count++ > 1000) return; // for dev only if more than 1000 mean we have a bug :)
         Notification.success ({message: scope.count+":"+slider.getId()+" ==> value=" +slider.getValue() +" view=" +slider.getView(), width: 100, delay: 10000});
-    }
+    };
 
-    // This call back handle low/height value of dual sliders
+    // This callback handles low/height value of dual sliders
     scope.SliderDualSelectionCB = function (slider) {
-
-        if (scope.count++ > 1000) return; // more than 1000 mean we have a bug :)
-
-        $log.log (scope.count, "scope.RangeDualSliderCB Slider=", slider);
+        if (scope.count++ > 1000) return; // for dev only if more than 1000 mean we have a bug :)
         Notification.success ({message: scope.count+":"+slider.getId()+" ==> Low=" +slider.getValue(0) +" Height=" + slider.getValue(1) +" view=" +slider.getView(0) + "/" + slider.getView(1), width: 100, delay: 10000});
-    }
+    };
 
 
 };

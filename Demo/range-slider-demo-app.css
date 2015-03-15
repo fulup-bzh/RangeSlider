@@ -18,25 +18,26 @@ h4 {
     height: 100%;
 }
 
+
 .no-extra-margin {
     padding-bottom: 0;
     margin-bottom: 0;
 }
 
-.demo-range-slider  {
+.demo-range-slider-purple  {
     padding-right: 5rem;
     width: 95%;
-    background-color: rgba(154, 205, 50, 0.6) !important;
+    background-color: rgba(222, 164, 213, 0.6) !important;
 }
-.demo-range-slider .range-slider-active-segment {
-    background-color: rgba(82, 168, 200, 0.6);
+.demo-range-slider-purple .range-slider-active-segment {
+    background-color: rgba(197, 147, 255, 0.6);
 }
 
 
 #demo-slider-3a {
    margin-bottom: 0;
    background-color: rgba(154, 205, 50, 0.6) !important;
-    width: 97%;
+   width: 97%;
 }
 #demo-slider-3b {
    margin-top: 0;

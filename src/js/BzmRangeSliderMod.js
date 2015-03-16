@@ -413,9 +413,6 @@
                     }
                 } else scope.displays=[];
 
-
-                scope.initialSettings (scope.initial);
-
                 // Monitor any changes on start/stop dates.
                 scope.$watch('startAt', function() {
                     if (scope.value < scope.startAt ) {
@@ -430,6 +427,10 @@
                     }
                     if (scope.stopAt) scope.setStop (scope.stopAt);
                 });
+
+                // finish widget initialisation
+                scope.initialSettings (scope.initial);
+
             };
 
             scope.init();

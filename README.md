@@ -1,7 +1,9 @@
 RangeSlider for Angular & Foundation
 ====================================
 
-Range Slider for Angular & Foundation5. The only real dependency outside of Angular is Foundation RangeSlider SSS
+Range Sliders for Angular & Foundation5. The only real dependency outside of Angular is Foundation RangeSlider SSS
+
+ - should work on Firefox,Chrome,Safari with mouse,keyboard and touchscreen, does not work on old version of IE.
 
 Project :
  - demo: http://breizhme.net/rangeslider/demo/

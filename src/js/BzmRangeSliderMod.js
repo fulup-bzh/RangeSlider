@@ -191,6 +191,7 @@
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
                     offset = scope.relative[handle] *  scope.bounds.bar.width;
                 }
+
                 scope.translate (offset,handle);
                 scope.value[handle] = value;
 
@@ -220,6 +221,22 @@
                 }
             };
 
+            scope.moveHandle = function (handle, clientX, clientY) {
+                var offset;
+                if (scope.vertical) {
+                    offset = scope.bounds.bar.bottom - clientY;
+                    if (offset > scope.bounds.bar.height) offset = scope.bounds.bar.height;
+                    if (offset < scope.bounds.handles[handle].height) offset = scope.bounds.handles[handle].height;
+                } else {
+                    offset = clientX - scope.bounds.bar.left;
+                    if (offset + scope.bounds.handles[handle].width > scope.bounds.bar.width) offset = scope.bounds.bar.width - scope.bounds.handles[handle].width;
+                }
+                if (offset < 0) offset = 0;
+                scope.getValue(offset, handle);
+                scope.translate(offset, handle);
+            };
+
+
             scope.focusCB = function (inside) {
                 if (inside) {
                     $document.on('keypress',scope.keydown);
@@ -228,31 +245,72 @@
                 }
             };
 
+            // bar was touch let move handle to this point
+            scope.touchBarCB = function (event) {
+                var handle=0;
+                var relative;
+                var touches = event.changedTouches;
+                var oldvalue = scope.value[handle];
+
+                event.preventDefault();
+
+                // if we have two handles select closest one from touch point
+                if (scope.dual) {
+                    if (scope.vertical) relative = (touches[0].pageY - scope.bounds.bar.bottom) / scope.bounds.bar.height;
+                    else relative= (touches[0].pageX - scope.bounds.bar.left) / scope.bounds.bar.width;
+
+                    var distance0 = Math.abs(relative - scope.relative[0]);
+                    var distance1 = Math.abs(relative - scope.relative[1]);
+                    if (distance1 < distance0) handle=1;
+                }
+
+                // move handle to new place
+                scope.moveHandle (handle,touches[0].pageX, touches[0].pageY);
+
+                if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ngModel, scope.sliderid);
+            };
+
+            // handle was touch and drag
+            scope.touchHandleCB = function (touchevt, handle) {
+                var oldvalue = scope.value[handle];
+
+                touchevt.preventDefault();
+                $document.on('touchmove',touchmove);
+                $document.on('touchend' ,touchend);
+                element.unbind('touchstart', scope.touchBarCB);
+
+                function touchmove(event) {
+                    event.preventDefault();
+                    var touches = event.changedTouches;
+                    for (var idx = 0; idx < touches.length; idx++) {
+                        scope.moveHandle (handle,touches[idx].pageX, touches[idx].pageY);
+                    }
+                }
+
+                function touchend(event) {
+                   $document.unbind('touchmove',touchmove);
+                   $document.unbind('touchend' ,touchend);
+                   element.on('touchstart', scope.touchBarCB);
+
+                    // if value change notify application callback
+                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ngModel, scope.sliderid);
+                }
+            };
+
             scope.handleCB = function (clickevent, handle) {
 
                 var oldvalue = scope.value[handle];
-
                 // register mouse event to track handle
                 clickevent.preventDefault();
-                $document.on('mousemove', mousemove);
+
+                $document.on('mousemove',mousemove);
                 $document.on('mouseup', mouseup);
                 scope.handles[handle][0].focus();
                 scope.active=handle;
 
                 // slider handle is moving
                 function mousemove(event) {
-                    var offset;
-                    if (scope.vertical) {
-                        offset = scope.bounds.bar.bottom - event.clientY ;
-                        if (offset > scope.bounds.bar.height) offset = scope.bounds.bar.height;
-                        if (offset < scope.bounds.handles[handle].height) offset = scope.bounds.handles[handle].height;
-                    } else  {
-                        offset = event.clientX - scope.bounds.bar.left ;
-                        if (offset + scope.bounds.handles[handle].width > scope.bounds.bar.width) offset = scope.bounds.bar.width - scope.bounds.handles[handle].width;
-                    }
-                    if (offset < 0) offset = 0;
-                    scope.translate (offset, handle);
-                    scope.getValue  (offset, handle);
+                    scope.moveHandle (handle, event.clientX, event.clientY);
                 }
 
                 // mouse is up dans leave slider send resize events
@@ -295,10 +353,13 @@
 
                 // position handle to initial value(s)
                 scope.setvalue (initial[0],0);
+                element.on('touchstart', scope.touchBarCB);
+                scope.handles[0].on('touchstart', function(evt){scope.touchHandleCB(evt,0)});
 
                 // this slider has two handles low/hight
                 if (scope.dual) {
                     scope.handles[1].addClass('range-slider-handle');
+                    scope.handles[1].on('touchstart', function(evt){scope.touchHandleCB(evt,1)});
                     scope.setvalue (initial[1],1);
                 }
 
@@ -389,4 +450,6 @@
         link: link          // pickadate object's methods
     };
 }
+
 console.log ("range-slider module loaded");
+

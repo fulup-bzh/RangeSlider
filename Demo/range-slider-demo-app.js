@@ -13,6 +13,12 @@
 
 'use strict';
 
+if (typeof console !== 'object' || typeof console.log !== 'function') {
+    console.log = function (arg) {
+        //now you can alert the argument or do whatever even when console.log isn't natively supported
+    }
+};
+
 var opa = angular.module('BzmRangeSliderDemo', ['mm.foundation','ui-notification','bzm-range-slider']);
 
 opa.controller('DemoController', ['$log','$scope', 'Notification', DemoController]);

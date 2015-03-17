@@ -25,7 +25,7 @@ opa.controller('DemoController', ['$log','$scope', 'Notification', DemoControlle
 function DemoController ($log, scope, Notification) {
     scope.count=0;  // development counter to prevent from infinite loop
 
-    console.log ("Initialisation of DemoController");
+    //console.log ("Initialisation of DemoController");
 
     // demo helper to compute offset time in between two values
     scope.FormatTimeDiff = function (checkin, checkout) {
@@ -67,4 +67,4 @@ function DemoController ($log, scope, Notification) {
 
 };
 
-console.log ("range-slider-Demo-App Loaded");
+//console.log ("range-slider-Demo-App Loaded");

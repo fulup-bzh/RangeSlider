@@ -201,7 +201,9 @@
                 if (value < scope.notLess) value=scope.notLess;
 
                 if (scope.vertical) {
+                    console.log ("value=%d not less=%d", value, scope.notLess)
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
+                    console.log ("scope.relative[handle]=%s (value - scope.notLess)=%s (scope.notMore - scope.notLess)=%s", scope.relative[handle], (value - scope.notLess), (scope.notMore - scope.notLess))
                     if (handle ===0) offset = (scope.relative[handle] * scope.bounds.bar.height) + scope.bounds.handles[handle].height;
                     if (handle ===1) offset = (scope.relative[handle] * scope.bounds.bar.height);
                 } else {
@@ -403,13 +405,16 @@
 
                 // extract initial values from attrs and parse into int
                 if (!attrs.initial) {
-                    scope.initial  =   [scope.notLess,scope.notMore];
+                    scope.initial  = [scope.notLess,scope.notMore];
                 } else {
-                    var initial  = attrs.initial.split(',')
+                    var initial  = attrs.initial.split(',');
+                    console.log ("id=%s scope initial=%s", attrs.id, parseInt (initial[0]))
+
                     scope.initial = [
-                        parseInt (initial[0]) || scope.notLess,
-                        parseInt (initial[1]) || scope.notMore
-                    ]
+                        initial[0] !== undefined ? parseInt (initial[0]) : scope.notLess,
+                        initial[1] !== undefined ? parseInt (initial[1]) : scope.notMore
+                    ];
+                    console.log ("id=%s scope initial=%s", attrs.id, scope.initial)
                 }
 
                 if (scope.vertical) element.addClass("vertical-range");

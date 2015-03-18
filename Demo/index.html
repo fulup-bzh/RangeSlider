@@ -25,8 +25,8 @@
 
     <!-- Load BZM-RangeSlider JS & CSS -->
 	<link href="../dist/bzm-range-slider.css" rel="stylesheet"/>
-	<script src="../dist/bzm-range-slider.min.js"></script>
-	<!-- <script src="../src/js/BzmRangeSliderMod.js"></script>-->
+	<!--  <script src="../dist/bzm-range-slider.min.js"></script>-->
+	<script src="../src/js/BzmRangeSliderMod.js"></script>
 
     <!-- Load Application Demo -->
 	<script src="range-slider-demo-app.js"></script>
@@ -121,11 +121,11 @@
 				<div class="sample-box">
 					<div class="row collapse">
 				<div class="small-10 columns">
-					<range-slider id="demo-slider-3a" class="radius demo-slider-3 " ng-model="sliderVal3" start-at="sliderSetLimit.getValue(0)" stop-at="sliderSetLimit.getValue(1)"
-								  callback='SliderSelectionCB'  display-target="handle" formatter="SliderPriceCB" title="Checkin time" initial='7' by-step=-2 not-more="24">
+					<range-slider id="demo-slider-3a" class="radius bzm-range-slider-green demo-slider-3 " ng-model="sliderVal3" start-at="sliderSetLimit.getValue(0)" stop-at="sliderSetLimit.getValue(1)"
+								  callback='SliderSelectionCB'  display-target="handle" formatter="SliderPriceCB" title="Checkin time" initial='50' by-step=-2 not-more="100">
 					</range-slider>
 					<range-slider id="demo-slider-3b" class="radius demo-slider-3" ng-model="sliderSetLimit" dual-handles='true' display-target="handle"
-								  callback='SliderSelectionCB' formatter="SliderPriceCB"  title="Checkout time"  initial='8,20' by-step=-2 not-more="24">
+								  callback='SliderSelectionCB' formatter="SliderPriceCB"  title="Checkout time"  initial='25,75' by-step=5 not-more="100">
 					</range-slider>
 				</div>
 				<div class="display-time small-2 columns">

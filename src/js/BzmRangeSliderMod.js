@@ -107,12 +107,16 @@
 
                 // if internal value change update or model
                 if (newvalue != scope.value[handle]) {
+                    if (newvalue < scope.startValue) newvalue=scope.startValue;
+                    if (newvalue > scope.stopValue)  newvalue=scope.stopValue;
+
                     scope.value[handle] = newvalue;
                     if (scope.displays[handle]) {
                         if (scope.formatter) scope.displays[handle].html (scope.formatter (newvalue, scope.sliderid));
                         else scope.displays[handle].html (newvalue);
                     }
                     scope.$apply();
+                    if (newvalue > scope.startValue && newvalue < scope.stopValue) scope.translate(offset, handle);
                 }
             };
 
@@ -131,6 +135,7 @@
                     var offset = scope.bounds.bar.width * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.start.css('width',offset + 'px');
                 }
+                scope.startValue= value;
             };
 
             scope.setStop = function (value) {
@@ -147,6 +152,8 @@
                     var offset = scope.bounds.bar.width * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.stop.css({'right': 0, 'width': (scope.bounds.bar.width  - offset) + 'px'});
                 }
+
+                scope.stopValue= value;
             };
 
             scope.translate = function (offset, handle) {
@@ -241,9 +248,10 @@
                     offset = clientX - scope.bounds.bar.left;
                     if (offset + scope.bounds.handles[handle].width > scope.bounds.bar.width) offset = scope.bounds.bar.width - scope.bounds.handles[handle].width;
                 }
+
                 if (offset < 0) offset = 0;
+
                 scope.getValue(offset, handle);
-                scope.translate(offset, handle);
 
                 // prevent dual handle to cross
                 if (scope.dual && scope.value [0] > scope.value[1]) {
@@ -383,6 +391,8 @@
 
             scope.init = function () {
                 // let's use a dedicated object to handle Application/Component liaison
+                scope.startValue = -Infinity;
+                scope.stopValue  = Infinity;
                 scope.sliderid = attrs.id || "range-slide-" + parseInt (Math.random() * 1000);
                 scope.bystep   = parseInt(attrs.byStep) || 1;
                 scope.vertical = attrs.vertical   || false;

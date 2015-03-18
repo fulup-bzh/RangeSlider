@@ -119,6 +119,11 @@
 
             scope.setStart = function (value) {
 
+                if (value > scope.value[0]) {
+                    if (!scope.dual) scope.setValue (value,0);
+                    else scope.setValue (value,1);
+                }
+
                 if (scope.vertical) {
                     var offset = scope.bounds.bar.height * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.start.css('height',offset + 'px');
@@ -129,6 +134,11 @@
             };
 
             scope.setStop = function (value) {
+
+                if (value < scope.value[0]) {
+                    if (!scope.dual) scope.setValue (value,0);
+                    else scope.setValue (value,1);
+                }
 
                 if (scope.vertical) {
                     var offset = scope.bounds.bar.height * (value - scope.notLess) / (scope.notMore - scope.notLess);
@@ -173,7 +183,7 @@
             };
 
             // position handle on the bar depending a given value
-            scope.setvalue = function (value , handle) {
+            scope.setValue = function (value , handle) {
                 var offset;
 
                 // if value did not change ignore
@@ -208,13 +218,13 @@
                 switch(e.keyCode){
                     case 39: // Right
                     case 38: // up
-                         if (scope.bystep > 0) scope.$apply(scope.setvalue ((scope.value[scope.active]+scope.bystep), scope.active));
-                         if (scope.bystep < 0) scope.$apply(scope.setvalue ((scope.value[scope.active]+(1 / Math.pow(10, scope.bystep*-1))),scope.active));
+                         if (scope.bystep > 0) scope.$apply(scope.setValue ((scope.value[scope.active]+scope.bystep), scope.active));
+                         if (scope.bystep < 0) scope.$apply(scope.setValue ((scope.value[scope.active]+(1 / Math.pow(10, scope.bystep*-1))),scope.active));
                          break;
                     case 37: // left
                     case 40: // down
-                        if (scope.bystep > 0) scope.$apply(scope.setvalue ((scope.value[scope.active] - scope.bystep), scope.active));
-                        if (scope.bystep < 0) scope.$apply(scope.setvalue ((scope.value[scope.active] - (1 / Math.pow(10, scope.bystep*-1))),scope.active));
+                        if (scope.bystep > 0) scope.$apply(scope.setValue ((scope.value[scope.active] - scope.bystep), scope.active));
+                        if (scope.bystep < 0) scope.$apply(scope.setValue ((scope.value[scope.active] - (1 / Math.pow(10, scope.bystep*-1))),scope.active));
                         break;
                     case 27: // esc
                         scope.handles[scope.active][0].blur();
@@ -234,6 +244,12 @@
                 if (offset < 0) offset = 0;
                 scope.getValue(offset, handle);
                 scope.translate(offset, handle);
+
+                // prevent dual handle to cross
+                if (scope.dual && scope.value [0] > scope.value[1]) {
+                    if (handle === 0) scope.setValue (scope.value[0] , 1);
+                    else scope.setValue(scope.value[1],0);
+                }
             };
 
 
@@ -352,7 +368,7 @@
                 };
 
                 // position handle to initial value(s)
-                scope.setvalue (initial[0],0);
+                scope.setValue (initial[0],0);
                 element.on('touchstart', scope.touchBarCB);
                 scope.handles[0].on('touchstart', function(evt){scope.touchHandleCB(evt,0)});
 
@@ -360,13 +376,12 @@
                 if (scope.dual) {
                     scope.handles[1].addClass('range-slider-handle');
                     scope.handles[1].on('touchstart', function(evt){scope.touchHandleCB(evt,1)});
-                    scope.setvalue (initial[1],1);
+                    scope.setValue (initial[1],1);
                 }
 
             };
 
             scope.init = function () {
-                console.log ("init range-slider id=%s", attrs.id);
                 // let's use a dedicated object to handle Application/Component liaison
                 scope.sliderid = attrs.id || "range-slide-" + parseInt (Math.random() * 1000);
                 scope.bystep   = parseInt(attrs.byStep) || 1;
@@ -416,14 +431,14 @@
                 // Monitor any changes on start/stop dates.
                 scope.$watch('startAt', function() {
                     if (scope.value < scope.startAt ) {
-                        //scope.setvalue (scope.startAt);
+                        //scope.setValue (scope.startAt);
                     }
                     if (scope.startAt) scope.setStart (scope.startAt);
                 });
 
                 scope.$watch('stopAt' , function() {
                     if (scope.value > scope.stopAt) {
-                        //scope.setvalue (scope.stopAt);
+                        //scope.setValue (scope.stopAt);
                     }
                     if (scope.stopAt) scope.setStop (scope.stopAt);
                 });

@@ -121,18 +121,18 @@
 				<div class="sample-box">
 					<div class="row collapse">
 				<div class="small-10 columns">
-					<range-slider id="demo-slider-3a" class="radius demo-slider-3 " ng-model="sliderVal3in" stop-at="sliderVal3out.getValue()" display-target="handle"
-								  callback='SliderSelectionCB' formatter="SliderFormatCB" title="Checkin time" initial='7' by-step=-2 not-more="24">
+					<range-slider id="demo-slider-3a" class="radius demo-slider-3 " ng-model="sliderVal3" start-at="sliderSetLimit.getValue(0)" stop-at="sliderSetLimit.getValue(1)"
+								  callback='SliderSelectionCB'  display-target="handle" formatter="SliderPriceCB" title="Checkin time" initial='7' by-step=-2 not-more="24">
 					</range-slider>
-					<range-slider id="demo-slider-3b" class="radius demo-slider-3" ng-model="sliderVal3out" start-at="sliderVal3in.getValue()" display-target="handle"
-								  callback='SliderSelectionCB' formatter="SliderFormatCB"  title="Checkout time"  initial='18' by-step=-2 not-more="24">
+					<range-slider id="demo-slider-3b" class="radius demo-slider-3" ng-model="sliderSetLimit" dual-handles='true' display-target="handle"
+								  callback='SliderSelectionCB' formatter="SliderPriceCB"  title="Checkout time"  initial='8,20' by-step=-2 not-more="24">
 					</range-slider>
 				</div>
 				<div class="display-time small-2 columns">
 					<ul class="no-extra-margin">
-					<li>Start = {{sliderVal3in.getView()}}</li>
-					<li>Stop  = {{sliderVal3out.getView()}}</li>
-					<li>Offset= {{FormatTimeDiff(sliderVal3in,sliderVal3out)}}</li>
+					<li>Start = {{sliderSetLimit.getValue(0)}}</li>
+					<li>Stop  = {{sliderSetLimit.getValue(1)}}</li>
+					<li>Cursor= {{sliderVal3.getValue()}}</li>
 					</ul>
 				</div>
 			</div>

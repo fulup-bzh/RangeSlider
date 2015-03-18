@@ -104,6 +104,8 @@
                     scope.relative[handle] = offset /  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width);
                 }
 
+                console.log ("getvalue offset=%d relative=%s", offset, scope.relative[handle])
+
                 var newvalue = scope.normalize (scope.relative[handle]);
 
                 // if internal value change update or model
@@ -162,11 +164,6 @@
                     // take handle size in account to compute middle
                     var voffset = scope.bounds.bar.getBoundingClientRect().height - offset;
 
-                    var half     = scope.bounds.bar.getBoundingClientRect().height/2;
-                    var relative = Math.abs(voffset - half);
-                    var adjust   = (scope.bounds.handles[handle].getBoundingClientRect().height/2 * (1 - relative/half));
-                    voffset = voffset  + adjust;
-                    
                     scope.handles[handle].css({
                         '-webkit-transform': 'translateY(' + voffset + 'px)',
                         '-moz-transform': 'translateY(' + voffset + 'px)',
@@ -174,7 +171,7 @@
                         '-o-transform': 'translateY(' + voffset + 'px)',
                         'transform': 'translateY(' + voffset + 'px)'
                    });
-                   if (!scope.dual) scope.slider.css('height', (offset - adjust) + 'px');
+                   if (!scope.dual) scope.slider.css('height', offset + 'px');
                    else if (scope.relative[1] && scope.relative[0]) {
                        var height = (scope.relative[1] - scope.relative[0]) *  scope.bounds.bar.getBoundingClientRect().height;
                        var start  = (scope.relative[0] *  scope.bounds.bar.getBoundingClientRect().height);
@@ -182,17 +179,12 @@
                    }
                 } else {
 
-                    // take handle size in account to compute middle
-                    var half = scope.bounds.bar.getBoundingClientRect().width/2;
-                    var relative = Math.abs(offset - half);
-                    var move = offset - (scope.bounds.handles[handle].getBoundingClientRect().width/2 * (1 - relative/half));
-
                     scope.handles[handle].css({
-                        '-webkit-transform': 'translateX(' + move + 'px)',
-                        '-moz-transform': 'translateX(' + move + 'px)',
-                        '-ms-transform': 'translateX(' + move + 'px)',
-                        '-o-transform': 'translateX(' + move + 'px)',
-                        'transform': 'translateX(' + move + 'px)'
+                        '-webkit-transform': 'translateX(' + offset + 'px)',
+                        '-moz-transform': 'translateX(' + offset + 'px)',
+                        '-ms-transform': 'translateX(' + offset + 'px)',
+                        '-o-transform': 'translateX(' + offset + 'px)',
+                        'transform': 'translateX(' + offset + 'px)'
                     });
                     if (!scope.dual) scope.slider.css('width',offset + 'px');
                     else if (scope.relative[1] && scope.relative[0]) {
@@ -220,7 +212,7 @@
                     if (handle ===1) offset = scope.relative[handle] * scope.bounds.bar.getBoundingClientRect().height;
                 } else {
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    offset = scope.relative[handle] *  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width/2);
+                    offset = scope.relative[handle] *  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width);
                 }
 
                 scope.translate (offset,handle);
@@ -260,12 +252,16 @@
                     if (offset < scope.bounds.handles[handle].getBoundingClientRect().height) offset = scope.bounds.handles[handle].getBoundingClientRect().height;
                 } else {
                     offset = clientX - scope.bounds.bar.getBoundingClientRect().left;
-                    if (offset + scope.bounds.handles[handle].getBoundingClientRect().width > scope.bounds.bar.getBoundingClientRect().width) offset = scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width;
+
+                    $log.log ("offset=%s clientX=%s left=%j", offset, clientX, scope.bounds.bar.getBoundingClientRect() )
+                    if (offset < 0) offset = 0;
+                    if ((clientX + scope.bounds.handles[handle].getBoundingClientRect().width) > scope.bounds.bar.getBoundingClientRect().right) {
+                        offset = scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width;
+                        $log.log('offset)', offset, "bounds=", scope.bounds.handles[handle].getBoundingClientRect())
+                    }
                 }
 
-                if (offset < 0) offset = 0;
-
-                scope.getValue(offset, handle);
+                scope.getValue  (offset, handle);
 
                 // prevent dual handle to cross
                 if (scope.dual && scope.value [0] > scope.value[1]) {

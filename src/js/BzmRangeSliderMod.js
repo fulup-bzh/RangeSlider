@@ -216,11 +216,11 @@
 
                 if (scope.vertical) {
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    if (handle ===0) offset = (scope.relative[handle] * scope.bounds.bar.getBoundingClientRect().height) + scope.bounds.handles[handle].getBoundingClientRect().height;
-                    if (handle ===1) offset = (scope.relative[handle] * scope.bounds.bar.getBoundingClientRect().height);
+                    if (handle ===0) offset = (scope.relative[handle] * scope.bounds.bar.getBoundingClientRect().height) + scope.bounds.handles[handle].getBoundingClientRect().height/2;
+                    if (handle ===1) offset = scope.relative[handle] * scope.bounds.bar.getBoundingClientRect().height;
                 } else {
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    offset = scope.relative[handle] *  scope.bounds.bar.getBoundingClientRect().width;
+                    offset = scope.relative[handle] *  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width/2);
                 }
 
                 scope.translate (offset,handle);

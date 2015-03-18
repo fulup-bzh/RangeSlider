@@ -99,10 +99,11 @@
             scope.getValue = function (offset, handle) {
 
                 if (scope.vertical) {
-                    scope.relative[handle] = (offset - scope.bounds.handles[handle].height) /  (scope.bounds.bar.height - scope.bounds.handles[handle].height);
+                    scope.relative[handle] = (offset - scope.bounds.handles[handle].getBoundingClientRect().height) / (scope.bounds.bar.getBoundingClientRect().height - scope.bounds.handles[handle].getBoundingClientRect().height);
                 } else {
-                    scope.relative[handle] = (offset) /  (scope.bounds.bar.width - scope.bounds.handles[handle].width);
+                    scope.relative[handle] = offset /  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width);
                 }
+
                 var newvalue = scope.normalize (scope.relative[handle]);
 
                 // if internal value change update or model
@@ -129,10 +130,10 @@
                 }
 
                 if (scope.vertical) {
-                    var offset = scope.bounds.bar.height * (value - scope.notLess) / (scope.notMore - scope.notLess);
+                    var offset = scope.bounds.bar.getBoundingClientRect().height * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.start.css('height',offset + 'px');
                 } else {
-                    var offset = scope.bounds.bar.width * (value - scope.notLess) / (scope.notMore - scope.notLess);
+                    var offset = scope.bounds.bar.getBoundingClientRect().width * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.start.css('width',offset + 'px');
                 }
                 scope.startValue= value;
@@ -146,11 +147,11 @@
                 }
 
                 if (scope.vertical) {
-                    var offset = scope.bounds.bar.height * (value - scope.notLess) / (scope.notMore - scope.notLess);
+                    var offset = scope.bounds.bar.getBoundingClientRect().height * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.start.css('height',offset + 'px');
                 } else {
-                    var offset = scope.bounds.bar.width * (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    scope.stop.css({'right': 0, 'width': (scope.bounds.bar.width  - offset) + 'px'});
+                    var offset = scope.bounds.bar.getBoundingClientRect().width * (value - scope.notLess) / (scope.notMore - scope.notLess);
+                    scope.stop.css({'right': 0, 'width': (scope.bounds.bar.getBoundingClientRect().width  - offset) + 'px'});
                 }
 
                 scope.stopValue= value;
@@ -158,7 +159,14 @@
 
             scope.translate = function (offset, handle) {
                 if (scope.vertical) {
-                    var voffset = scope.bounds.bar.height - offset;
+                    // take handle size in account to compute middle
+                    var voffset = scope.bounds.bar.getBoundingClientRect().height - offset;
+
+                    var half     = scope.bounds.bar.getBoundingClientRect().height/2;
+                    var relative = Math.abs(voffset - half);
+                    var adjust   = (scope.bounds.handles[handle].getBoundingClientRect().height/2 * (1 - relative/half));
+                    voffset = voffset  + adjust;
+                    
                     scope.handles[handle].css({
                         '-webkit-transform': 'translateY(' + voffset + 'px)',
                         '-moz-transform': 'translateY(' + voffset + 'px)',
@@ -166,24 +174,30 @@
                         '-o-transform': 'translateY(' + voffset + 'px)',
                         'transform': 'translateY(' + voffset + 'px)'
                    });
-                   if (!scope.dual) scope.slider.css('height',offset + 'px');
+                   if (!scope.dual) scope.slider.css('height', (offset - adjust) + 'px');
                    else if (scope.relative[1] && scope.relative[0]) {
-                       var height = parseInt ((scope.relative[1] - scope.relative[0]) *  scope.bounds.bar.height);
-                       var start  = parseInt ((scope.relative[0] *  scope.bounds.bar.height));
+                       var height = (scope.relative[1] - scope.relative[0]) *  scope.bounds.bar.getBoundingClientRect().height;
+                       var start  = (scope.relative[0] *  scope.bounds.bar.getBoundingClientRect().height);
                        scope.slider.css ({'bottom': start+'px','height': height + 'px'})
                    }
                 } else {
+
+                    // take handle size in account to compute middle
+                    var half = scope.bounds.bar.getBoundingClientRect().width/2;
+                    var relative = Math.abs(offset - half);
+                    var move = offset - (scope.bounds.handles[handle].getBoundingClientRect().width/2 * (1 - relative/half));
+
                     scope.handles[handle].css({
-                        '-webkit-transform': 'translateX(' + offset + 'px)',
-                        '-moz-transform': 'translateX(' + offset + 'px)',
-                        '-ms-transform': 'translateX(' + offset + 'px)',
-                        '-o-transform': 'translateX(' + offset + 'px)',
-                        'transform': 'translateX(' + offset + 'px)'
+                        '-webkit-transform': 'translateX(' + move + 'px)',
+                        '-moz-transform': 'translateX(' + move + 'px)',
+                        '-ms-transform': 'translateX(' + move + 'px)',
+                        '-o-transform': 'translateX(' + move + 'px)',
+                        'transform': 'translateX(' + move + 'px)'
                     });
                     if (!scope.dual) scope.slider.css('width',offset + 'px');
                     else if (scope.relative[1] && scope.relative[0]) {
-                        var width = parseInt ((scope.relative[1] - scope.relative[0]) *  scope.bounds.bar.width);
-                        var start = parseInt (scope.relative[0] *  scope.bounds.bar.width);
+                        var width = (scope.relative[1] - scope.relative[0]) *  scope.bounds.bar.getBoundingClientRect().width;
+                        var start = (scope.relative[0] *  scope.bounds.bar.getBoundingClientRect().width);
                         scope.slider.css ({'left': start+'px','width': width + 'px'})
                     }
                 }
@@ -201,14 +215,12 @@
                 if (value < scope.notLess) value=scope.notLess;
 
                 if (scope.vertical) {
-                    console.log ("value=%d not less=%d", value, scope.notLess)
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    console.log ("scope.relative[handle]=%s (value - scope.notLess)=%s (scope.notMore - scope.notLess)=%s", scope.relative[handle], (value - scope.notLess), (scope.notMore - scope.notLess))
-                    if (handle ===0) offset = (scope.relative[handle] * scope.bounds.bar.height) + scope.bounds.handles[handle].height;
-                    if (handle ===1) offset = (scope.relative[handle] * scope.bounds.bar.height);
+                    if (handle ===0) offset = (scope.relative[handle] * scope.bounds.bar.getBoundingClientRect().height) + scope.bounds.handles[handle].getBoundingClientRect().height;
+                    if (handle ===1) offset = (scope.relative[handle] * scope.bounds.bar.getBoundingClientRect().height);
                 } else {
                     scope.relative[handle] = (value - scope.notLess) / (scope.notMore - scope.notLess);
-                    offset = scope.relative[handle] *  scope.bounds.bar.width;
+                    offset = scope.relative[handle] *  scope.bounds.bar.getBoundingClientRect().width;
                 }
 
                 scope.translate (offset,handle);
@@ -216,7 +228,7 @@
 
                 if (scope.displays[handle]) {
                     if (scope.formatter) scope.displays[handle].html (scope.formatter (value, scope.sliderid));
-                    else scope.display.html (value);
+                    else scope.displays[handle].html (value);
                 }
             };
 
@@ -243,12 +255,12 @@
             scope.moveHandle = function (handle, clientX, clientY) {
                 var offset;
                 if (scope.vertical) {
-                    offset = scope.bounds.bar.bottom - clientY;
-                    if (offset > scope.bounds.bar.height) offset = scope.bounds.bar.height;
-                    if (offset < scope.bounds.handles[handle].height) offset = scope.bounds.handles[handle].height;
+                    offset = scope.bounds.bar.getBoundingClientRect().bottom - clientY;
+                    if (offset > scope.bounds.bar.getBoundingClientRect().height) offset = scope.bounds.bar.getBoundingClientRect().height;
+                    if (offset < scope.bounds.handles[handle].getBoundingClientRect().height) offset = scope.bounds.handles[handle].getBoundingClientRect().height;
                 } else {
-                    offset = clientX - scope.bounds.bar.left;
-                    if (offset + scope.bounds.handles[handle].width > scope.bounds.bar.width) offset = scope.bounds.bar.width - scope.bounds.handles[handle].width;
+                    offset = clientX - scope.bounds.bar.getBoundingClientRect().left;
+                    if (offset + scope.bounds.handles[handle].getBoundingClientRect().width > scope.bounds.bar.getBoundingClientRect().width) offset = scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width;
                 }
 
                 if (offset < 0) offset = 0;
@@ -282,8 +294,8 @@
 
                 // if we have two handles select closest one from touch point
                 if (scope.dual) {
-                    if (scope.vertical) relative = (touches[0].pageY - scope.bounds.bar.bottom) / scope.bounds.bar.height;
-                    else relative= (touches[0].pageX - scope.bounds.bar.left) / scope.bounds.bar.width;
+                    if (scope.vertical) relative = (touches[0].pageY - scope.bounds.bar.getBoundingClientRect().bottom) / scope.bounds.bar.getBoundingClientRect().height;
+                    else relative= (touches[0].pageX - scope.bounds.bar.getBoundingClientRect().left) / scope.bounds.bar.getBoundingClientRect().width;
 
                     var distance0 = Math.abs(relative - scope.relative[0]);
                     var distance1 = Math.abs(relative - scope.relative[1]);
@@ -373,8 +385,8 @@
 
                 // get components geometry
                 scope.bounds = {
-                    bar    : element[0].getBoundingClientRect(),
-                    handles: [scope.handles[0][0].getBoundingClientRect(), scope.handles[1][0].getBoundingClientRect()]
+                    bar    : element[0],
+                    handles: [scope.handles[0][0], scope.handles[1][0]]
                 };
 
                 // position handle to initial value(s)
@@ -403,32 +415,15 @@
                 scope.notMore  = parseInt(attrs.notMore)   || 100;
                 scope.notLess  = parseInt(attrs.notLess)   || 0;
 
-                // extract initial values from attrs and parse into int
-                if (!attrs.initial) {
-                    scope.initial  = [scope.notLess,scope.notMore];
-                } else {
-                    var initial  = attrs.initial.split(',');
-                    console.log ("id=%s scope initial=%s", attrs.id, parseInt (initial[0]))
-
-                    scope.initial = [
-                        initial[0] !== undefined ? parseInt (initial[0]) : scope.notLess,
-                        initial[1] !== undefined ? parseInt (initial[1]) : scope.notMore
-                    ];
-                    console.log ("id=%s scope initial=%s", attrs.id, scope.initial)
-                }
-
                 if (scope.vertical) element.addClass("vertical-range");
 
-                if (attrs.format) { // see angular filter ex: date|HH:mm|trailer
-                    scope.format = attrs.format.split("|");
-                }
-
                 scope.handles= [scope.find('.handle-min'), scope.find('.handle-max')];
-
+                scope.bar    = element;
                 scope.slider = scope.find('.range-slider-active-segment');
                 scope.start  = scope.find('.bzm-range-slider-start');
                 scope.stop   = scope.find('.bzm-range-slider-stop');
                 scope.ngModel= new RangeSliderHandle (scope);
+
 
                 if (attrs.displayTarget) {
                     switch (attrs.displayTarget) {
@@ -442,6 +437,17 @@
                             scope.displays =  [$document.getElementById (attrs.displayTarget)];
                     }
                 } else scope.displays=[];
+
+                // extract initial values from attrs and parse into int
+                if (!attrs.initial) {
+                    scope.initial  = [scope.notLess,scope.notMore];
+                } else {
+                    var initial  = attrs.initial.split(',');
+                    scope.initial = [
+                        initial[0] !== undefined ? parseInt (initial[0]) : scope.notLess,
+                        initial[1] !== undefined ? parseInt (initial[1]) : scope.notMore
+                    ];
+                }
 
                 // Monitor any changes on start/stop dates.
                 scope.$watch('startAt', function() {

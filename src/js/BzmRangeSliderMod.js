@@ -104,8 +104,6 @@
                     scope.relative[handle] = offset /  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width);
                 }
 
-                console.log ("getvalue offset=%d relative=%s", offset, scope.relative[handle])
-
                 var newvalue = scope.normalize (scope.relative[handle]);
 
                 // if internal value change update or model
@@ -253,11 +251,9 @@
                 } else {
                     offset = clientX - scope.bounds.bar.getBoundingClientRect().left;
 
-                    $log.log ("offset=%s clientX=%s left=%j", offset, clientX, scope.bounds.bar.getBoundingClientRect() )
                     if (offset < 0) offset = 0;
                     if ((clientX + scope.bounds.handles[handle].getBoundingClientRect().width) > scope.bounds.bar.getBoundingClientRect().right) {
                         offset = scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width;
-                        $log.log('offset)', offset, "bounds=", scope.bounds.handles[handle].getBoundingClientRect())
                     }
                 }
 

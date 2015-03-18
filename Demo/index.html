@@ -45,21 +45,21 @@
 			<div class="small-1 columns vertical-zone">
 				<div class="row">
 					<range-slider id="vertical-slider-1" vertical="true" class="bzm-range-slider-green radius" callback='SliderSelectionCB'
-								  ng-model="sliderVertical1" not-less='10' not-more='80' initial='5' title="Vertical Slider" step=1>
+								  ng-model="sliderVertical1" not-less='10' not-more='80' initial='5' title="Vertical Slider">
 
 					</range-slider>
 					{{sliderVertical1.getView()}}
 				</div>
 				<div class="row">
 					<range-slider id="vertical-slider-2" vertical="true" class="bzm-range-slider-green radius" callback='SliderSelectionCB' display-target="handle"
-								  ng-model="sliderVertical2" formatter="SliderFormatCB" not-more='24' initial='5' title="Vertical Slider" step=1>
+								  ng-model="sliderVertical2" formatter="SliderFormatCB" not-more='24' initial='5' title="Vertical Slider">
 					</range-slider>
 				</div>
 
 				<div class="row">
 					<range-slider id="vertical-slider-2" vertical="true" class="bzm-range-slider-green radius" display-target="handle"
 								  initial="6,18" dual-handles="true"  callback='SliderSelectionCB'
-								  ng-model="sliderVertical2" formatter="SliderFormatCB" not-more='24' initial='5' title="Vertical Slider" step=-2>
+								  ng-model="sliderVertical2" formatter="SliderFormatCB" not-more='24' initial='5' title="Vertical Slider" by-step=-2>
 					</range-slider>
 				</div>
 			</div>
@@ -119,22 +119,37 @@
 			<div class="row">
 				<h3>Synchronized Range Slider</h3>
 				<div class="sample-box">
-					<div class="row collapse">
+				<div class="row collapse">
+					<div class="small-1 columns">
+						<range-slider vertical="true" class="left bzm-range-slider-green radius" formatter='SliderPriceCB' display-target="handle"
+									  ng-model="sliderMinPrice" not-less='0' not-more='50' initial='15' by-step="5" title="Min Price">
+
+						</range-slider>
+					</div>
+
 				<div class="small-10 columns">
-					<range-slider id="demo-slider-3a" class="radius bzm-range-slider-green demo-slider-3 " ng-model="sliderVal3" start-at="sliderSetLimit.getValue(0)" stop-at="sliderSetLimit.getValue(1)"
+				    <div class="row">
+					<range-slider id="demo-slider-3a" class="radius bzm-range-slider-green demo-slider-3 " ng-model="sliderPrice" start-at="sliderMinPrice.getValue()" stop-at="sliderMaxPrice.getValue()"
 								  callback='SliderSelectionCB'  display-target="handle" formatter="SliderPriceCB" title="Checkin time" initial='50' by-step=-2 not-more="100">
 					</range-slider>
-					<range-slider id="demo-slider-3b" class="radius demo-slider-3" ng-model="sliderSetLimit" dual-handles='true' display-target="handle"
-								  callback='SliderSelectionCB' formatter="SliderPriceCB"  title="Checkout time"  initial='25,75' by-step=5 not-more="100">
-					</range-slider>
+					</div>
+					<div class="row">
+						<div class="small-5 columns center display-time">
+						<ul>
+							<li>MinPrice = {{sliderMinPrice.getValue()}} &euro;</li>
+							<li>MaxPrice = {{sliderMaxPrice.getValue()}} &euro;</li>
+							<li>Cursor= {{sliderPrice.getValue()}} &euro;</li>
+						</ul>
+						</div>
+					</div>
 				</div>
-				<div class="display-time small-2 columns">
-					<ul class="no-extra-margin">
-					<li>Start = {{sliderSetLimit.getValue(0)}}</li>
-					<li>Stop  = {{sliderSetLimit.getValue(1)}}</li>
-					<li>Cursor= {{sliderVal3.getValue()}}</li>
-					</ul>
+				<div class="small-1 right columns">
+						<range-slider vertical="true" class="left bzm-range-slider-green radius" formatter='SliderPriceCB' display-target="handle"
+									  ng-model="sliderMaxPrice" not-less='50' not-more='100' initial='75' by-step="5" title="Max Price">
+
+						</range-slider>
 				</div>
+
 			</div>
 			</div>
 			</div>

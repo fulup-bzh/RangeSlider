@@ -269,9 +269,9 @@
 
             scope.focusCB = function (inside) {
                 if (inside) {
-                    $document.on('keypress',scope.keydown);
+                    $document.on('keydown',scope.keydown);
                 } else {
-                    $document.unbind('keypress',scope.keydown);
+                    $document.unbind('keydown',scope.keydown);
                 }
             };
 
@@ -399,7 +399,6 @@
                 // let's use a dedicated object to handle Application/Component liaison
                 scope.startValue = -Infinity;
                 scope.stopValue  = Infinity;
-                scope.sliderid = attrs.id || "range-slide-" + parseInt (Math.random() * 1000);
                 scope.bystep   = parseInt(attrs.byStep) || 1;
                 scope.vertical = attrs.vertical   || false;
                 scope.dual     = attrs.dualHandles|| false;

@@ -63,7 +63,7 @@
                       + '<span class="range-slider-active-segment"></span>'
                       + '<span class="bzm-range-slider-start" ></span> '
                       + '<span class="bzm-range-slider-stop"></span> '
-                      + '<input type="hidden">'
+                      + '<input id={{sliderid}} type="hidden">'
                     + '</div>';
 
 

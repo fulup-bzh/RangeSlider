@@ -74,9 +74,10 @@
 
                 if (!modelvalue) return; // make sure we have some data to work with
 
-                if (modelvalue.title && !scope.titledone) {
-                    scope.title = modelvalue.title;
-                    scope.titledone = true;
+                if (!scope.initdone) {
+                    scope.initdone = true;
+                   if (modelvalue.title)  scope.title    = modelvalue.title;
+                   if (modelvalue.id)     scope.sliderid = modelvalue.id;
                 }
 
                 if (modelvalue.byStep)     scope.byStep  = parseInt(modelvalue.byStep);
@@ -86,8 +87,6 @@
                 // update slider view
                 if (modelvalue.startAt) scope.setStart (modelvalue.startAt);
                 if (modelvalue.stopAt)  scope.setStop  (modelvalue.stopAt);
-
-                $log.log ("slider formatter id=%d value=%s", scope.sliderid, modelvalue.value);
 
                 if (modelvalue.value) {
                     if (!scope.dual)   {

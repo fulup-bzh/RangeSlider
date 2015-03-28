@@ -45,10 +45,10 @@
 			<div class="small-1 columns vertical-zone">
 				<div class="row">
 					<range-slider id="vertical-slider-1" vertical="true" class="bzm-range-slider-green radius" callback='SliderSelectionCB'
-								  ng-model="sliderVertical1" not-less='-10' not-more='10' initial='0' title="Vertical Slider">
+								  ng-model="initFromApp"  title="Vertical Slider">
 
 					</range-slider>
-					{{sliderVertical1.getView()}}
+					{{initFromApp}}
 				</div>
 				<div class="row">
 					<range-slider id="vertical-slider-2" vertical="true" class="bzm-range-slider-green radius" callback='SliderSelectionCB' display-target="handle"
@@ -77,14 +77,11 @@
 						<div class="small-10 columns">
 						   <range-slider id="demo-slider-1" class="demo-range-slider-purple radius" ng-model="rangeSliderVal1" not-less="-50" not-more="+50" initial='0' callback="SliderSelectionCB"></range-slider>
 						</div>
-						<div class="display-time small-2 columns">
-							{{rangeSliderVal1.getValue()}}%
-						</div>
+
 					</div>
 					<div class="row collapse">
 					<ul>
-						<li>Internal-Value : {{rangeSliderVal1.getValue()}}</li>
-						<li>Relative-Value : {{rangeSliderVal1.getRelative()}}</li>
+						<li>Internal-Value : {{rangeSliderVal1}}</li>
 					</ul>
 					</div>
 				</div>
@@ -107,8 +104,7 @@
 					</div>
 					<div class="row collapse">
 						<ul>
-						<li>Internal-Value : {{rangeSliderVal2.getValue()}}</li>
-						<li>Relative-Value : {{rangeSliderVal2.getRelative()}}</li>
+						<li>Value : {{rangeSliderVal2}}</li>
 						</ul>
 					</div>
 				</div>
@@ -136,9 +132,9 @@
 					<div class="row">
 						<div class="small-5 columns center display-time">
 						<ul>
-							<li>MinPrice = {{sliderMinPrice.getValue()}} &euro;</li>
-							<li>MaxPrice = {{sliderMaxPrice.getValue()}} &euro;</li>
-							<li>Cursor= {{sliderPrice.getValue()}} &euro;</li>
+							<li>MinPrice = {{sliderMinPrice}}</li>
+							<li>MaxPrice = {{sliderMaxPrice}}</li>
+							<li>Cursor   = {{sliderPrice}}</li>
 						</ul>
 						</div>
 					</div>

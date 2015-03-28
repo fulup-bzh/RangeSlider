@@ -57,7 +57,7 @@
     RangeSlider.directive('rangeSlider', ["$log", "$document", "$filter", bzmFoundationSlider]);
     function bzmFoundationSlider ($log, $document, $filter) {
 
-        var template= '<div class="bzm-range-slider range-slider" data-slider>'
+        var template= '<div class="bzm-range-slider range-slider" title="{{title}}"data-slider>'
                       + '<span class="range-slider-handle handle-min" ng-mousedown="handleCB($event,0)" ng-focus="focusCB(true)" ng-blur="focusCB(false)" role="slider" tabindex="0"></span>'
                       + '<span class="handle-max" ng-mousedown="handleCB($event,1)" ng-focus="focusCB(true)" ng-blur="focusCB(false)" role="slider" tabindex="0"></span>'
                       + '<span class="range-slider-active-segment"></span>'
@@ -69,24 +69,55 @@
 
         function link (scope, element, attrs, model) {
 
-           scope.normalize = function (value) {
+            // call when internal model value changes
+            model.$formatters.unshift(function(modelvalue) {
+
+                if (!modelvalue) return; // make sure we have some data to work with
+
+                if (modelvalue.title && !scope.titledone) {
+                    scope.title = modelvalue.title;
+                    scope.titledone = true;
+                }
+
+                if (modelvalue.byStep)     scope.byStep  = parseInt(modelvalue.byStep);
+                if (modelvalue.notMore)    scope.notMore = parseInt(modelvalue.notMore);
+                if (modelvalue.notLess)    scope.notLess = parseInt(modelvalue.notLess);
+
+                // update slider view
+                if (modelvalue.startAt) scope.setStart (modelvalue.startAt);
+                if (modelvalue.stopAt)  scope.setStop  (modelvalue.stopAt);
+
+                $log.log ("slider formatter id=%d value=%s", scope.sliderid, modelvalue.value);
+
+                if (modelvalue.value) {
+                    if (!scope.dual)   {
+                        if (modelvalue.value != modelvalue.value[0])scope.setValue(modelvalue.value,0);
+                    }
+                    else {
+                        if (modelvalue.value[0] != modelvalue.value[0]) scope.setValue(modelvalue.value[0],0);
+                        if (modelvalue.value[1] != modelvalue.value[0]) scope.setValue(modelvalue.value[1],1);
+                    }
+                }
+            });
+
+            scope.normalize = function (value) {
                 var range = scope.notMore - scope.notLess;
                 var point = value * range;
 
                 // if step is positive let's round step by step
-                if (scope.bystep >  0) {
-                    var mod = (point - (point % scope.bystep)) / scope.bystep;
-                    var rem = point % scope.bystep;
+                if (scope.byStep >  0) {
+                    var mod = (point - (point % scope.byStep)) / scope.byStep;
+                    var rem = point % scope.byStep;
 
-                    var round = (rem >= scope.bystep * 0.5 ? scope.bystep : 0);
-                    var result= (mod * scope.bystep + round) + scope.notLess;
+                    var round = (rem >= scope.byStep * 0.5 ? scope.byStep : 0);
+                    var result= (mod * scope.byStep + round) + scope.notLess;
                     //console.log ("range=%d value=%d point=%d mod=%d rem=%d round=%d result=%d", range, value, point, mod, rem, round, result)
                     return result;
                 }
 
                 // if step is negative return round to asked decimal
-                if (scope.bystep <  0) {
-                    var power  =  Math.pow (10,(scope.bystep * -1));
+                if (scope.byStep <  0) {
+                    var power  =  Math.pow (10,(scope.byStep * -1));
                     var result = scope.notLess + parseInt (point * power) / power;
                     return (result);
                 }
@@ -106,16 +137,21 @@
 
                 var newvalue = scope.normalize (scope.relative[handle]);
 
+
                 // if internal value change update or model
                 if (newvalue != scope.value[handle]) {
                     if (newvalue < scope.startValue) newvalue=scope.startValue;
                     if (newvalue > scope.stopValue)  newvalue=scope.stopValue;
 
-                    scope.value[handle] = newvalue;
                     if (scope.displays[handle]) {
+
                         if (scope.formatter) scope.displays[handle].html (scope.formatter (newvalue, scope.sliderid));
                         else scope.displays[handle].html (newvalue);
                     }
+
+                    // update external representation of the model
+                    scope.value[handle] = newvalue;
+                    model.$setViewValue (scope.value);
                     scope.$apply();
                     if (newvalue > scope.startValue && newvalue < scope.stopValue) scope.translate(offset, handle);
                 }
@@ -135,7 +171,9 @@
                 } else {
                     var offset = scope.bounds.bar.getBoundingClientRect().width * (value - scope.notLess) / (scope.notMore - scope.notLess);
                     scope.start.css('width',offset + 'px');
-                }
+                };
+
+
                 scope.startValue= value;
             };
 
@@ -216,9 +254,14 @@
                 scope.translate (offset,handle);
                 scope.value[handle] = value;
 
+                if (scope.formatter) {
+                    model.$setViewValue(scope.formatter (value, scope.sliderid))
+                } else {
+                    model.$setViewValue(value)
+                }
+
                 if (scope.displays[handle]) {
-                    if (scope.formatter) scope.displays[handle].html (scope.formatter (value, scope.sliderid));
-                    else scope.displays[handle].html (value);
+                    scope.displays[handle].html (model.$viewValue);
                 }
             };
 
@@ -229,13 +272,13 @@
                 switch(e.keyCode){
                     case 39: // Right
                     case 38: // up
-                         if (scope.bystep > 0) scope.$apply(scope.setValue ((scope.value[scope.active]+scope.bystep), scope.active));
-                         if (scope.bystep < 0) scope.$apply(scope.setValue ((scope.value[scope.active]+(1 / Math.pow(10, scope.bystep*-1))),scope.active));
+                         if (scope.byStep > 0) scope.$apply(scope.setValue ((scope.value[scope.active]+scope.byStep), scope.active));
+                         if (scope.byStep < 0) scope.$apply(scope.setValue ((scope.value[scope.active]+(1 / Math.pow(10, scope.byStep*-1))),scope.active));
                          break;
                     case 37: // left
                     case 40: // down
-                        if (scope.bystep > 0) scope.$apply(scope.setValue ((scope.value[scope.active] - scope.bystep), scope.active));
-                        if (scope.bystep < 0) scope.$apply(scope.setValue ((scope.value[scope.active] - (1 / Math.pow(10, scope.bystep*-1))),scope.active));
+                        if (scope.byStep > 0) scope.$apply(scope.setValue ((scope.value[scope.active] - scope.byStep), scope.active));
+                        if (scope.byStep < 0) scope.$apply(scope.setValue ((scope.value[scope.active] - (1 / Math.pow(10, scope.byStep*-1))),scope.active));
                         break;
                     case 27: // esc
                         scope.handles[scope.active][0].blur();
@@ -296,8 +339,7 @@
 
                 // move handle to new place
                 scope.moveHandle (handle,touches[0].pageX, touches[0].pageY);
-
-                if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ngModel, scope.sliderid);
+                if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.export, scope.sliderid);
             };
 
             // handle was touch and drag
@@ -323,7 +365,7 @@
                    element.on('touchstart', scope.touchBarCB);
 
                     // if value change notify application callback
-                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ngModel, scope.sliderid);
+                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.export, scope.sliderid);
                 }
             };
 
@@ -349,7 +391,7 @@
                     $document.unbind('mouseup', mouseup);
 
                     // if value change notify application callback
-                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ngModel, scope.sliderid);
+                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.export, scope.sliderid);
                 }
             };
 
@@ -371,7 +413,7 @@
                 scope.relative=[];
 
                 if (scope.precision === null) {
-                    decimal_places_match_result = ('' + scope.bystep).match(/\.([\d]*)/);
+                    decimal_places_match_result = ('' + scope.byStep).match(/\.([\d]*)/);
                     scope.precision = decimal_places_match_result && decimal_places_match_result[1] ? decimal_places_match_result[1].length : 0;
                 }
 
@@ -396,10 +438,10 @@
             };
 
             scope.init = function () {
-                // let's use a dedicated object to handle Application/Component liaison
+                scope.sliderid   = attrs.id || "rg-slider-" + parseInt (Math.random() * 1000);
                 scope.startValue = -Infinity;
                 scope.stopValue  = Infinity;
-                scope.bystep   = parseInt(attrs.byStep) || 1;
+                scope.byStep   = parseInt(attrs.byStep) || 1;
                 scope.vertical = attrs.vertical   || false;
                 scope.dual     = attrs.dualHandles|| false;
                 scope.trigger_input_change= false;
@@ -413,8 +455,7 @@
                 scope.slider = scope.find('.range-slider-active-segment');
                 scope.start  = scope.find('.bzm-range-slider-start');
                 scope.stop   = scope.find('.bzm-range-slider-stop');
-                scope.ngModel= new RangeSliderHandle (scope);
-
+                scope.export = new RangeSliderHandle (scope);
 
                 if (attrs.displayTarget) {
                     switch (attrs.displayTarget) {
@@ -466,14 +507,14 @@
     return {
         restrict: "E",    // restrict to <range-slider> HTML element name
         scope: {
-            ngModel : '=',  // necessary to update internal from inside directive
-            startAt : '=',  // First acceptable date
-            stopAt  : '=',  // Last acceptable date
-            callback: '=',  // Callback to active when a date is selected
-            formatter:'='   // Callback for drag event call each time internal value changes
+            startAt  : '=',  // First acceptable date
+            stopAt   : '=',  // Last acceptable date
+            callback : '=',  // Callback to active when a date is selected
+            formatter:'=',   // Callback for drag event call each time internal value changes
+            handle   :'='    // Callback for drag event call each time internal value changes
         },
+        require: 'ngModel',
         template: template, // html template is build from JS
-        require: 'ngModel', // get access to external/internal representation
         replace: true,      // replace current directive with template while inheriting of class
         link: link          // pickadate object's methods
     };

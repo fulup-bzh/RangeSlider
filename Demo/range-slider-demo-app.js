@@ -13,18 +13,32 @@
 
 'use strict';
 
-var opa = angular.module('BzmRangeSliderDemo', ['mm.foundation','ui-notification','bzm-range-slider']);
+var opa = angular.module('BzmRangeSliderDemo', ['mm.foundation', 'ui-notification','bzm-range-slider']);
 
-opa.controller('DemoController', ['$log','$scope', 'Notification', DemoController]);
-function DemoController ($log, scope, Notification) {
+opa.controller('DemoController', ['$log','$scope', '$timeout', 'Notification', DemoController]);
+function DemoController ($log, scope, $timeout, Notification) {
     scope.count=0;  // development counter to prevent from infinite loop
 
     //console.log ("Initialisation of DemoController");
+    scope.appchange = function ()   {
+
+        scope.initFromApp = {
+
+            byStep:  1,
+            notLess: -50,
+            notMore: 50,
+            value: parseInt(Math.random()*100) - 50
+        };
+        $timeout (scope.appchange, 5000);
+    };
+    scope.appchange();
+
 
     // demo helper to compute offset time in between two values
     scope.FormatTimeDiff = function (checkin, checkout) {
         var value;
 
+        if (!checkin || !checkout) return;
         // if we have only one ng-model them it should be a dual handles slider
         if (checkout) value = checkout.getValue() - checkin.getValue();
         else value = checkin.getValue(1) - checkin.getValue(0);

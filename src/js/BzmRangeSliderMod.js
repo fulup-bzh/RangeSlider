@@ -88,9 +88,28 @@
                 if (modelvalue.startAt) scope.setStart (modelvalue.startAt);
                 if (modelvalue.stopAt)  scope.setStop  (modelvalue.stopAt);
 
-                if (modelvalue.value) {
+                if (modelvalue.disabled !== undefined) {
+
+                    console.log ("slide disable id", scope.sliderid)
+
+                    if (modelvalue.disabled) {
+                        scope.translate(0,0);
+                        scope.handles[0].css ('visibility','hidden');
+                        if (scope.dual) {
+                            scope.translate(0,1);
+                            scope.handles[1].css ('visibility','hidden');
+                        }
+                    } else {
+                        scope.handles[0].css ('visibility','visible');
+                        if (scope.dual) scope.handles[1].css ('visibility','visible');
+                    }
+                }
+
+                if (modelvalue.value !== undefined) {
                     if (!scope.dual)   {
-                        if (modelvalue.value != modelvalue.value[0])scope.setValue(modelvalue.value,0);
+                        if (modelvalue.value != modelvalue.value[0]) {
+                            scope.setValue(modelvalue.value,0);
+                        }
                     }
                     else {
                         if (modelvalue.value[0] != modelvalue.value[0]) scope.setValue(modelvalue.value[0],0);

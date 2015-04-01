@@ -30,7 +30,7 @@
 
             // build external representation and save it for further requests
             internals[handle] = scope.value[handle];
-            if (scope.formatter) externals[handle] = scope.formatter(scope.value[handle], scope.sliderid);
+            if (scope.formatter) externals[handle] = scope.formatter(scope.value[handle], scope.sliderid, scope.modelvalue);
             else  externals[handle] = scope.value[handle];
 
             return externals[handle];
@@ -75,7 +75,14 @@
                 if (!modelvalue) return; // make sure we have some data to work with
 
                 if (!scope.initdone) {
-                    scope.initdone = true;
+                   scope.initdone   = true;
+
+                   // allow callback to get original modelvalue as a handle
+                   scope.modelvalue = modelvalue;
+                   if (!modelvalue.value) {
+                       if (scope.value) modelvalue.value = scope.value;
+                       else modelvalue.value = [0,0];
+                   }
                    if (modelvalue.title)  scope.title    = modelvalue.title;
                    if (modelvalue.id)     scope.sliderid = modelvalue.id;
                 }
@@ -106,15 +113,8 @@
                 }
 
                 if (modelvalue.value !== undefined) {
-                    if (!scope.dual)   {
-                        if (modelvalue.value != modelvalue.value[0]) {
-                            scope.setValue(modelvalue.value,0);
-                        }
-                    }
-                    else {
-                        if (modelvalue.value[0] != modelvalue.value[0]) scope.setValue(modelvalue.value[0],0);
-                        if (modelvalue.value[1] != modelvalue.value[0]) scope.setValue(modelvalue.value[1],1);
-                    }
+                    if (scope.value[0] != modelvalue.value[0]) scope.setValue(modelvalue.value[0],0);
+                    if (scope.dual && scope.value[1] != modelvalue.value[1])  scope.setValue(modelvalue.value[1],1);
                 }
             });
 
@@ -163,7 +163,10 @@
 
                     if (scope.displays[handle]) {
 
-                        if (scope.formatter) scope.displays[handle].html (scope.formatter (newvalue, scope.sliderid));
+                        if (scope.formatter) {
+                            if (scope.modelvalue)  scope.modelvalue.value = scope.value; // update internal representation of modelvalue
+                            scope.displays[handle].html (scope.formatter (newvalue, scope.sliderid, scope.modelvalue));
+                        }
                         else scope.displays[handle].html (newvalue);
                     }
 

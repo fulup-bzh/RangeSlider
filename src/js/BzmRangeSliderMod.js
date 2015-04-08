@@ -22,6 +22,10 @@
             return scope.sliderid;
         };
 
+        this.getCbHandle = function() {
+            return scope.cbhandle;
+        };
+
         this.getView= function (handle) {
             if (!handle) handle = 0;
 
@@ -30,10 +34,14 @@
 
             // build external representation and save it for further requests
             internals[handle] = scope.value[handle];
-            if (scope.formatter) externals[handle] = scope.formatter(scope.value[handle], scope.sliderid, scope.modelvalue);
+            if (scope.formatter) externals[handle] = scope.formatter(scope.value[handle], scope.ctrlhandle);
             else  externals[handle] = scope.value[handle];
 
             return externals[handle];
+        };
+
+        this.updateClass = function (classe, status) {
+           scope.updateClass (classe, status);
         };
 
         this.getValue= function (handle) {
@@ -48,8 +56,12 @@
 
         this.setValue= function (value, handle) {
             if (!handle) handle = 0;
-            scope.setValue (value);
+            scope.setValue (value, handle);
         };
+
+        this.setDisable= function (flag) {
+            scope.setDisable(flag)
+        }
     }
 
 
@@ -69,54 +81,44 @@
 
         function link (scope, element, attrs, model) {
 
-            // call when internal model value changes
-            model.$formatters.unshift(function(modelvalue) {
 
-                if (!modelvalue) return; // make sure we have some data to work with
+            // full initialisation of slider from a single object
+            scope.initWidget = function (initValues) {
+                
+                if (initValues.byStep)  scope.byStep  = parseInt(initValues.byStep);
+                if (initValues.notMore) scope.notMore = parseInt(initValues.notMore);
+                if (initValues.notLess) scope.notLess = parseInt(initValues.notLess);
+                if (initValues.id)      scope.sliderid= initValues.id;
 
-                if (!scope.initdone) {
-                   scope.initdone   = true;
 
-                   // allow callback to get original modelvalue as a handle
-                   scope.modelvalue = modelvalue;
-                   if (!modelvalue.value) {
-                       if (scope.value) modelvalue.value = scope.value;
-                       else modelvalue.value = [0,0];
-                   }
-                   if (modelvalue.title)  scope.title    = modelvalue.title;
-                   if (modelvalue.id)     scope.sliderid = modelvalue.id;
+                if (initValues.value !== undefined) {
+                    scope.setValue(initValues.value[0],0);
+                    if (scope.dual)  scope.setValue(initValues.value[1],1);
                 }
+            };
 
-                if (modelvalue.byStep)     scope.byStep  = parseInt(modelvalue.byStep);
-                if (modelvalue.notMore)    scope.notMore = parseInt(modelvalue.notMore);
-                if (modelvalue.notLess)    scope.notLess = parseInt(modelvalue.notLess);
+            // handler to change class from slider handle
+            scope.updateClass = function (classe, status) {
 
-                // update slider view
-                if (modelvalue.startAt) scope.setStart (modelvalue.startAt);
-                if (modelvalue.stopAt)  scope.setStop  (modelvalue.stopAt);
+                if (status) element.addClass (classe);
+                else  element.removeClass (classe);
+            };
 
-                if (modelvalue.disabled !== undefined) {
+            scope.setDisable = function (disabled) {
 
-                    console.log ("slide disable id", scope.sliderid)
-
-                    if (modelvalue.disabled) {
-                        scope.translate(0,0);
-                        scope.handles[0].css ('visibility','hidden');
-                        if (scope.dual) {
-                            scope.translate(0,1);
-                            scope.handles[1].css ('visibility','hidden');
-                        }
-                    } else {
-                        scope.handles[0].css ('visibility','visible');
-                        if (scope.dual) scope.handles[1].css ('visibility','visible');
+                if (disabled) {
+                    element.addClass ("disable");
+                    scope.handles[0].css ('visibility','hidden');
+                    if (scope.dual) {
+                        scope.handles[1].css ('visibility','hidden');
                     }
+                } else {
+                    element.removeClass ("disable");
+                    scope.handles[0].css ('visibility','visible');
+                    if (scope.dual) scope.handles[1].css ('visibility','visible');
                 }
 
-                if (modelvalue.value !== undefined) {
-                    if (scope.value[0] != modelvalue.value[0]) scope.setValue(modelvalue.value[0],0);
-                    if (scope.dual && scope.value[1] != modelvalue.value[1])  scope.setValue(modelvalue.value[1],1);
-                }
-            });
+            };
 
             scope.normalize = function (value) {
                 var range = scope.notMore - scope.notLess;
@@ -164,15 +166,14 @@
                     if (scope.displays[handle]) {
 
                         if (scope.formatter) {
-                            if (scope.modelvalue)  scope.modelvalue.value = scope.value; // update internal representation of modelvalue
-                            scope.displays[handle].html (scope.formatter (newvalue, scope.sliderid, scope.modelvalue));
+                            scope.displays[handle].html (scope.formatter (newvalue, scope.ctrlhandle));
                         }
                         else scope.displays[handle].html (newvalue);
                     }
 
                     // update external representation of the model
                     scope.value[handle] = newvalue;
-                    model.$setViewValue (scope.value);
+                    if (model) model.$setViewValue (scope.value);
                     scope.$apply();
                     if (newvalue > scope.startValue && newvalue < scope.stopValue) scope.translate(offset, handle);
                 }
@@ -276,13 +277,16 @@
                 scope.value[handle] = value;
 
                 if (scope.formatter) {
-                    model.$setViewValue(scope.formatter (value, scope.sliderid))
+                    // when call through setValue we do not pass cbHandle
+                    scope.viewValue = scope.formatter (value, undefined);
                 } else {
-                    model.$setViewValue(value)
+                    scope.viewValue = value;
                 }
 
+                if (model) model.$setViewValue( scope.viewValue)
+
                 if (scope.displays[handle]) {
-                    scope.displays[handle].html (model.$viewValue);
+                    scope.displays[handle].html (scope.viewValue);
                 }
             };
 
@@ -360,7 +364,7 @@
 
                 // move handle to new place
                 scope.moveHandle (handle,touches[0].pageX, touches[0].pageY);
-                if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.export, scope.sliderid);
+                if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ctrlhandle);
             };
 
             // handle was touch and drag
@@ -386,7 +390,7 @@
                    element.on('touchstart', scope.touchBarCB);
 
                     // if value change notify application callback
-                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.export, scope.sliderid);
+                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ctrlhandle);
                 }
             };
 
@@ -412,7 +416,7 @@
                     $document.unbind('mouseup', mouseup);
 
                     // if value change notify application callback
-                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.export, scope.sliderid);
+                    if (scope.callback && oldvalue !== scope.value[handle]) scope.callback (scope.ctrlhandle);
                 }
             };
 
@@ -456,10 +460,12 @@
                     scope.setValue (initial[1],1);
                 }
 
+                // if we have an initstate object apply it
+                if (scope.initValues) scope.initWidget (scope.initValues);
             };
 
             scope.init = function () {
-                scope.sliderid   = attrs.id || "rg-slider-" + parseInt (Math.random() * 1000);
+                scope.sliderid   = attrs.id || "slider-" + parseInt (Math.random() * 1000);
                 scope.startValue = -Infinity;
                 scope.stopValue  = Infinity;
                 scope.byStep   = parseInt(attrs.byStep) || 1;
@@ -476,12 +482,17 @@
                 scope.slider = scope.find('.range-slider-active-segment');
                 scope.start  = scope.find('.bzm-range-slider-start');
                 scope.stop   = scope.find('.bzm-range-slider-stop');
-                scope.export = new RangeSliderHandle (scope);
+                scope.disable= attrs.disable || false;
+
+                scope.ctrlhandle = new RangeSliderHandle (scope);
+
+
+                if (attrs.disable === 'true') scope.setDisable(true);
 
                 if (attrs.displayTarget) {
                     switch (attrs.displayTarget) {
+                        case true :
                         case 'handle' :
-                        case 'handles' :
                             scope.displays = scope.handles;
                             scope.handles[0].addClass('bzm-range-slider-display');
                             if (scope.dual) scope.handles[1].addClass('bzm-range-slider-display');
@@ -523,18 +534,24 @@
             };
 
             scope.init();
+            // slider is ready provide control handle to application controller
+            if (scope.inithook) scope.inithook (scope.ctrlhandle);
+
         }
 
     return {
         restrict: "E",    // restrict to <range-slider> HTML element name
         scope: {
-            startAt  : '=',  // First acceptable date
-            stopAt   : '=',  // Last acceptable date
-            callback : '=',  // Callback to active when a date is selected
-            formatter:'=',   // Callback for drag event call each time internal value changes
-            handle   :'='    // Callback for drag event call each time internal value changes
+            startAt  :'=',  // First acceptable date
+            stopAt   :'=',  // Last acceptable date
+            callback :'=',  // Callback to active when a date is selected
+            formatter:'=',  // Callback for drag event call each time internal value changes
+            inithook :'=',  // Hook point to control slider from API
+            cbhandle :'=',  // Argument added to every callback
+            initValues:'='   // Initial values as a single object
+
         },
-        require: 'ngModel',
+        require: '?ngModel',
         template: template, // html template is build from JS
         replace: true,      // replace current directive with template while inheriting of class
         link: link          // pickadate object's methods

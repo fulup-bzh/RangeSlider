@@ -19,20 +19,39 @@ opa.controller('DemoController', ['$log','$scope', '$timeout', 'Notification', D
 function DemoController ($log, scope, $timeout, Notification) {
     scope.count=0;  // development counter to prevent from infinite loop
 
-    //console.log ("Initialisation of DemoController");
-    scope.appchange = function ()   {
 
-        scope.initFromApp = {
+    // this CB is call when slide is ready attr=inithook
+    scope.appSlideCtrlCB = function (sliderHandle) {
 
-            byStep:  1,
+       // use slide handle to set value
+       sliderHandle.setValue (parseInt(Math.random()*100) - 50);
+
+       // animate slide for ever
+       $timeout (function() {scope.appSlideCtrlCB (sliderHandle)}, 5000);
+    };
+
+    // Initialisation of slider in one shot
+    scope.initFromApp = {
+            id     : 'dynamic-slide-sample',
+            byStep :  1,
             notLess: -50,
             notMore: 50,
-            value: parseInt(Math.random()*100) - 50
-        };
-        $timeout (scope.appchange, 5000);
+            value  : 15
     };
-    scope.appchange();
 
+    // set min/max price default
+    scope.Price = {
+        mini: 0,
+        maxi: 100
+    };
+    scope.SetPriceRange = function (slider) {
+      var handle =   slider.getCbHandle();
+      var slideid=   slider.getId();
+      console.log ("setPriceCB sliderid=%s", slider.getId());
+
+      if (slideid == "mini")  handle.mini= slider.getValue();
+      if (slideid == "maxi")  handle.maxi= slider.getValue();
+    };
 
     // demo helper to compute offset time in between two values
     scope.FormatTimeDiff = function (checkin, checkout) {
@@ -72,7 +91,7 @@ function DemoController ($log, scope, $timeout, Notification) {
     };
 
     // This callback handles low/height value of dual sliders
-    scope.SliderDualSelectionCB = function (slider) {
+    scope.SliderDualSelectionCB = function (value, slider) {
         if (scope.count++ > 1000) return; // for dev only if more than 1000 mean we have a bug :)
         Notification.success ({message: scope.count+":"+slider.getId()+" ==> Low=" +slider.getValue(0) +" Height=" + slider.getValue(1) +" view=" +slider.getView(0) + "/" + slider.getView(1), width: 100, delay: 10000});
     };

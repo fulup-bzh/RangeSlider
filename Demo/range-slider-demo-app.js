@@ -44,13 +44,13 @@ function DemoController ($log, scope, $timeout, Notification) {
         mini: 0,
         maxi: 100
     };
-    scope.SetPriceRange = function (slider) {
+    scope.SetPriceRange = function (value, slider) {
       var handle =   slider.getCbHandle();
       var slideid=   slider.getId();
       console.log ("setPriceCB sliderid=%s", slider.getId());
 
-      if (slideid == "mini")  handle.mini= slider.getValue();
-      if (slideid == "maxi")  handle.maxi= slider.getValue();
+      if (slideid == "mini")  handle.mini= value;
+      if (slideid == "maxi")  handle.maxi= value;
     };
 
     // demo helper to compute offset time in between two values
@@ -85,7 +85,7 @@ function DemoController ($log, scope, $timeout, Notification) {
 
 
     // Callback for standard slider call when mouse quit the slider
-    scope.SliderSelectionCB = function (slider) {
+    scope.SliderSelectionCB = function (value, slider) {
         if (scope.count++ > 1000) return; // for dev only if more than 1000 mean we have a bug :)
         Notification.success ({message: scope.count+":"+slider.getId()+" ==> value=" +slider.getValue() +" view=" +slider.getView(), width: 100, delay: 10000});
     };

@@ -25,6 +25,8 @@ Installation
 
         angular.module('app', ['bzm-range-slider']);
 
+Nota: when moving to Node-V4x remove existing node_modules directory and reapply "npm install" or you will get "Error: libsass bindings not found. Try reinstalling node-sass?"
+
 	
 Usage  <range-slider>
 ---------------------

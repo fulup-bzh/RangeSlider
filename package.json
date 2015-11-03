@@ -6,5 +6,6 @@
     "grunt-contrib-watch": "*",
     "grunt-contrib-uglify": "*",
     "grunt-sass": "*"
+
   }
 }

@@ -81,7 +81,6 @@ function bzmFoundationSlider ($log, $document, $timeout) {
 
 
     function link (scope, element, attrs, model) {
-
         // full initialisation of slider from a single object
         scope.initWidget = function (initvalues) {
 
@@ -126,7 +125,6 @@ function bzmFoundationSlider ($log, $document, $timeout) {
                 element.removeClass ("disable");
                 scope.handles[0].css ('visibility','visible');
                 if (scope.dual) scope.handles[1].css ('visibility','visible');
-                console.log ("enabling slider")
             }
 
         };
@@ -159,7 +157,6 @@ function bzmFoundationSlider ($log, $document, $timeout) {
 
         // return current value
         scope.getValue = function (offset, handle) {
-
             if (scope.vertical) {
                 scope.relative[handle] = (offset - scope.bounds.handles[handle].getBoundingClientRect().height) / (scope.bounds.bar.getBoundingClientRect().height - scope.bounds.handles[handle].getBoundingClientRect().height);
             } else {
@@ -186,7 +183,7 @@ function bzmFoundationSlider ($log, $document, $timeout) {
 
                 // update external representation of the model
                 scope.value[handle] = newvalue;
-                if (model) model.$setViewValue (scope.value);
+                if (model) model.$setViewValue (scope.viewValue);
                 scope.$apply();
                 if (newvalue > scope.startValue && newvalue < scope.stopValue) scope.translate(offset, handle);
             }
@@ -297,7 +294,7 @@ function bzmFoundationSlider ($log, $document, $timeout) {
                 scope.viewValue = value;
             }
 
-            if (model) model.$setViewValue( scope.viewValue)
+            if (model) model.$setViewValue( scope.viewValue);
 
             if (scope.displays[handle]) {
                 scope.displays[handle].html (scope.viewValue);
@@ -450,7 +447,6 @@ function bzmFoundationSlider ($log, $document, $timeout) {
 
 
         scope.initialSettings = function (initial) {
-
             var decimal_places_match_result;
             scope.value=[];  // store low/height value when two handles
             scope.relative=[];
@@ -460,20 +456,20 @@ function bzmFoundationSlider ($log, $document, $timeout) {
                 scope.precision = decimal_places_match_result && decimal_places_match_result[1] ? decimal_places_match_result[1].length : 0;
             }
 
-        // position handle to initial value(s)
-        element.on('touchstart', scope.touchBarCB);
-        scope.handles[0].on('touchstart', function(evt){scope.touchHandleCB(evt,0)});
+            // position handle to initial value(s)
+            element.on('touchstart', scope.touchBarCB);
+            scope.handles[0].on('touchstart', function(evt){scope.touchHandleCB(evt,0)});
 
-        // this slider has two handles low/hight
-        if (scope.dual) {
-            scope.handles[1].addClass('range-slider-handle');
-            scope.handles[1].on('touchstart', function(evt){scope.touchHandleCB(evt,1)});
-            if (!scope.initvalues) scope.setValue (initial[1],1);
-        }
+            // this slider has two handles low/hight
+            if (scope.dual) {
+                scope.handles[1].addClass('range-slider-handle');
+                scope.handles[1].on('touchstart', function(evt){scope.touchHandleCB(evt,1)});
+                if (!scope.initvalues) scope.setValue (initial[1],1);
+            }
 
-        // if we have an initstate object apply it
-        if (scope.initvalues) scope.initWidget (scope.initvalues);
-        else   scope.setValue (initial[0],0);
+            // if we have an initstate object apply it
+            if (scope.initvalues) scope.initWidget (scope.initvalues);
+            else   scope.setValue (initial[0],0);
         };
 
         scope.init = function () {
@@ -521,7 +517,7 @@ function bzmFoundationSlider ($log, $document, $timeout) {
 
             // extract initial values from attrs and parse into int
             if (!attrs.initial) {
-                scope.initial  = [scope.notLess,scope.notMore];
+                scope.initial  = [scope.ngModel, scope.ngModel]; // initialize to model values
             } else {
                 var initial  = attrs.initial.split(',');
                 scope.initial = [
@@ -569,8 +565,8 @@ return {
         formatter:'=',  // Callback for drag event call each time internal value changes
         inithook :'=',  // Hook point to control slider from API
         cbhandle :'=',  // Argument added to every callback
-        initvalues:'='   // Initial values as a single object
-
+        initvalues:'=',   // Initial values as a single object
+        ngModel: '='    // the model value
     },
     require: '?ngModel',
     template: template, // html template is build from JS
@@ -578,6 +574,3 @@ return {
     link: link          // pickadate object's methods
 };
 }
-
-console.log ("range-slider module loaded");
-

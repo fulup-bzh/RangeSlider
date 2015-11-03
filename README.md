@@ -21,6 +21,9 @@ Installation
     - **dist/bzm-range-slider.css**
 
 3. &lt;link&gt; and &lt;script&gt; them into your page 
+4. Include the module name `'bzm-range-slider'` in your angular app. For example:
+
+        angular.module('app', ['bzm-range-slider']);
 
 	
 Usage  <range-slider>

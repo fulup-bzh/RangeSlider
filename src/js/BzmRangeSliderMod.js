@@ -554,6 +554,10 @@ function bzmFoundationSlider ($log, $document, $timeout) {
             if (scope.initvalues) scope.initWidget(scope.initvalues);
         });
 
+        // two-way binding if model value changes
+        scope.$watch ('ngModel', function (newValue) {
+          scope.setValue(newValue, 0);
+        });
     }
 
 return {

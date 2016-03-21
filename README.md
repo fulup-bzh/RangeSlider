@@ -1,36 +1,45 @@
-RangeSlider for Angular & Foundation
+#RangeSlider for Angular & Foundation5
 ====================================
 
-Range Sliders for Angular & Foundation5. The only real dependency outside of Angular is Foundation RangeSlider SSS
+RangeSlider for Angular & Foundation5. The only real dependency outside of Angular is Foundation RangeSlider CSS
 
- - should work on Firefox,Chrome,Safari with mouse,keyboard and touchscreen, does not work on old version of IE.
+ - It should work correctly in Firefox, Chrome, Safari with mouse, keyboard and touchscreen. It does not work on old version of IE.
 
-Project :
- - demo: http://breizhme.net/rangeslider/demo/
- - home: https://github.com/fulup-bzh/RangeSlider
+####Project:
 
-This RangeSlider is Angular ported version for http://foundation.zurb.com/docs/components/range_slider.html
+ - **demo:** http://breizhme.net/rangeslider/demo/
+ - **home:** https://github.com/fulup-bzh/RangeSlider
 
-Installation
--------------
+This RangeSlider is Angular ported version of [Foundation's Range Slider](http://foundation.zurb.com/docs/components/range_slider.html)
 
-1. download & unzip source from GitHub repository:
+##Installation
 
-2. copy the files
-    - **dist/bzm-range-slider-min.js**
-    - **dist/bzm-range-slider.css**
+1. Install with bower:
 
-3. &lt;link&gt; and &lt;script&gt; them into your page 
-4. Include the module name `'bzm-range-slider'` in your angular app. For example:
+    ```
+    bower install bzm-range-slider --save
+    ```
 
-        angular.module('app', ['bzm-range-slider']);
+2. Add the JS and CSS files to your HTML:
 
-Nota: when moving to Node-V4x remove existing node_modules directory and reapply "npm install" or you will get "Error: libsass bindings not found. Try reinstalling node-sass?"
+    ```html
+    <link href="bower_components/bzm-range-slider/dist/bzm-range-slider.css" rel="stylesheet">
+    ...
+    <script src="bower_components/bzm-range-slider/dist/bzm-range-slider.min.js"></script>
+    ```
 
-	
-Usage  <range-slider>
----------------------
-```
+3. Include the module name `'bzm-range-slider'` in your angular app. For example:
+
+  ```js
+   angular.module('app', ['bzm-range-slider']);
+   ```
+
+***Note:*** when moving to Node v4.x remove existing `node_modules` directory and run `npm install` or you will get `Error: libsass bindings not found. Try reinstalling node-sass?`
+
+  
+##Usage  _\<range-slider\>_
+
+```html
    <range-slider
       id="my-slider-name"                     // only use as an argument to callback
       class="my-custom-class"                 // default class is bzm-range-slider
@@ -43,7 +52,7 @@ Usage  <range-slider>
       <!-- Angular Scope Variables -->
       callback="myCallBack"                    // $scope.myCallBack(sliderhandle) is called when ever slider handle blur
       formatter="SliderFormatCB"               // $scope.myFormatter(value, sliderid) when exist is call when ever slider handle moves. Should return external form of slider value.
-      ng-model="xxxxxx"                        // xxx Must be defined, script will store a new RangerObject within provided ng-model variable.
+      ng-model="xxxxxx"                        // xxxxxx Must be defined, script will store a new RangerObject within provided ng-model variable.
       start-at="ScopeVar"                      // Dynamic limitation when slider is constrains by an external componant [ex: check in/out]
       stop-at="ScopeVar"                       // Idem but for end.
 
@@ -64,7 +73,4 @@ Usage  <range-slider>
     xxxx.getView(0|1)     equivalement to getValue but for external representation of handle value after formatter callback
     xxxx.setValue(0|1)    set the value for a chosen handle
     xxxx.getRelative(0|1) return relative position of chosen handle
-
-
-
 ```

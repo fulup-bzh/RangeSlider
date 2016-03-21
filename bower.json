@@ -1,0 +1,27 @@
+{
+  "name": "bzm-range-slider",
+  "version": "0.0.1",
+  "description": "Range Sliders for Angular & Foundation5",
+  "main": "/dist/bzm-range-slider.min.js",
+  "authors": [
+    "Fulup Ar Foll <fulup@breizhme.net>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "Angular",
+    "Foundation",
+    "Range",
+    "Slider"
+  ],
+  "homepage": "https://github.com/fulup-bzh/RangeSlider",
+  "moduleType": [],
+  "dependencies": {},
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "nbproject",
+    "src",
+    "Gruntfile.js",
+    "MakeDist.sh"
+  ]
+}

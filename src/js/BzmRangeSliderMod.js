@@ -268,8 +268,6 @@ function bzmFoundationSlider ($log, $document, $timeout) {
         scope.setValue = function (value , handle) {
             var offset;
 
-            // if value did not change ignore
-            if (value === scope.value[handle]) return;
             if (value === undefined)   value=0;
             if (value > scope.notMore) value=scope.notMore;
             if (value < scope.notLess) value=scope.notLess;
@@ -284,7 +282,7 @@ function bzmFoundationSlider ($log, $document, $timeout) {
                 offset = scope.relative[handle] *  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width);
             }
 
-            scope.translate (offset,handle);
+            scope.translate (offset, handle);
             scope.value[handle] = value;
 
             if (scope.formatter) {
@@ -294,7 +292,7 @@ function bzmFoundationSlider ($log, $document, $timeout) {
                 scope.viewValue = value;
             }
 
-            if (model) model.$setViewValue( scope.viewValue);
+            if (model) { model.$setViewValue( scope.viewValue); }
 
             if (scope.displays[handle]) {
                 scope.displays[handle].html (scope.viewValue);
@@ -303,7 +301,7 @@ function bzmFoundationSlider ($log, $document, $timeout) {
 
 
         // Minimal keystroke handling to close picker with ESC [scope.actif is current handle index]
-        scope.keydown=  function(e){
+        scope.keydown = function(e){
 
             switch(e.keyCode){
                 case 39: // Right
@@ -468,8 +466,12 @@ function bzmFoundationSlider ($log, $document, $timeout) {
             }
 
             // if we have an initstate object apply it
-            if (scope.initvalues) scope.initWidget (scope.initvalues);
-            else   scope.setValue (initial[0],0);
+            if (scope.initvalues) { scope.initWidget (scope.initvalues); }
+            else {
+                $timeout(function(){
+                    scope.setValue (initial[0],0);
+                });
+            }
         };
 
         scope.init = function () {

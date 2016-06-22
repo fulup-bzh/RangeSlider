@@ -1,6 +1,6 @@
 {
   "name": "bzm-range-slider",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Range Sliders for Angular & Foundation5",
   "main": "/dist/bzm-range-slider.min.js",
   "authors": [

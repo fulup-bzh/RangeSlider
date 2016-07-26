@@ -159,7 +159,7 @@ function bzmFoundationSlider ($log, $document, $timeout) {
         scope.getValue = function (offset, handle) {
 
             var newvalue;
-            if (Foundation.libs.slider) {
+            if (Foundation && Foundation.libs && Foundation.libs.slider) {
                 // If available, get the value set by the Foundation range slider component
                 newvalue = parseFloat(document.getElementById(scope.sliderid).value);
             } else {

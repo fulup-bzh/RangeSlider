@@ -157,13 +157,20 @@ function bzmFoundationSlider ($log, $document, $timeout) {
 
         // return current value
         scope.getValue = function (offset, handle) {
-            if (scope.vertical) {
-                scope.relative[handle] = (offset - scope.bounds.handles[handle].getBoundingClientRect().height) / (scope.bounds.bar.getBoundingClientRect().height - scope.bounds.handles[handle].getBoundingClientRect().height);
-            } else {
-                scope.relative[handle] = offset /  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width);
-            }
 
-            var newvalue = scope.normalize (scope.relative[handle]);
+            var newvalue;
+            if (Foundation.libs.slider) {
+                // If available, get the value set by the Foundation range slider component
+                newvalue = parseFloat(document.getElementById(scope.sliderid).value);
+            } else {
+                if (scope.vertical) {
+                scope.relative[handle] = (offset - scope.bounds.handles[handle].getBoundingClientRect().height) / (scope.bounds.bar.getBoundingClientRect().height - scope.bounds.handles[handle].getBoundingClientRect().height);
+                } else {
+                    scope.relative[handle] = offset /  (scope.bounds.bar.getBoundingClientRect().width - scope.bounds.handles[handle].getBoundingClientRect().width);
+                }
+
+                newvalue = scope.normalize (scope.relative[handle]);
+            }
 
 
             // if internal value change update or model

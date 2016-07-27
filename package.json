@@ -1,6 +1,6 @@
 {
   "name": "bzm-range-slider",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "devDependencies": {
     "grunt": "*",
     "grunt-contrib-watch": "*",
